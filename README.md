@@ -23,5 +23,5 @@ Learn some code, and have fun!
 ### Assignment 2
 Complete any one of [these](https://projecteuler.net/archives). You may complete one of these to fulfill assignment 1 as well.
 
-After you are done, submit as (Username)-TitleOfProblem.cs
+After you are done, submit as (Username)-(TitleOfProblem).cs
 

@@ -9,7 +9,7 @@ If you have not, then let your first assignment be this:
 
 Do as I have done and start immersing yourself in the c# language. Write a program that has one of each of these items in it:
 
-1. At least one class, with at least one event
+1. At least one class, with at least one method
 
 2. Either a for loop, a while loop, or a do/while loop
 

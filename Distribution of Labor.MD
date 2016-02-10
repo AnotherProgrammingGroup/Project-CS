@@ -22,8 +22,6 @@
 
 ##superace
 
-##hacksoi
-
 ##Jelly
 1. Come back to the IRC!
 

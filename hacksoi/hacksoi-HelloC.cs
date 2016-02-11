@@ -6,13 +6,6 @@ namespace hacksoiHelloC
 {
     class RockPaperScissors
     {
-
-        static void Main(string[] args)
-        {
-            new RockPaperScissors().go();
-            Console.ReadKey();
-        }
-
         public void go()
         {
             int userScore = 0, computerScore = 0;
@@ -91,12 +84,10 @@ namespace hacksoiHelloC
             System.Threading.Thread.Sleep(1000);
             Console.WriteLine();
         }
-
     }
 
     class RockPaperScissorsHandler
     {
-
         public enum Outcome { LOSS, TIE, WIN, NULL };
 
         public static RPSChoice getChoice(string choice)
@@ -109,19 +100,15 @@ namespace hacksoiHelloC
                 return new Scissors();
             return new NoChoice();
         }
-
     }
 
     interface RPSChoice
     {
-
         RockPaperScissorsHandler.Outcome duel(RPSChoice other);
-
     }
 
     class Rock : RPSChoice
     {
-
         public RockPaperScissorsHandler.Outcome duel(RPSChoice other)
         {
             if (other is Rock)
@@ -132,12 +119,10 @@ namespace hacksoiHelloC
                 return RockPaperScissorsHandler.Outcome.WIN;
             return RockPaperScissorsHandler.Outcome.NULL;
         }
-
     }
 
     class Paper : RPSChoice
     {
-
         public RockPaperScissorsHandler.Outcome duel(RPSChoice other)
         {
             if (other is Rock)
@@ -148,12 +133,10 @@ namespace hacksoiHelloC
                 return RockPaperScissorsHandler.Outcome.LOSS;
             return RockPaperScissorsHandler.Outcome.NULL;
         }
-
     }
 
     class Scissors : RPSChoice
     {
-
         public RockPaperScissorsHandler.Outcome duel(RPSChoice other)
         {
             if (other is Rock)
@@ -164,17 +147,14 @@ namespace hacksoiHelloC
                 return RockPaperScissorsHandler.Outcome.TIE;
             return RockPaperScissorsHandler.Outcome.NULL;
         }
-
     }
 
     class NoChoice : RPSChoice
     {
-
         public RockPaperScissorsHandler.Outcome duel(RPSChoice other)
         {
             return RockPaperScissorsHandler.Outcome.NULL;
         }
-
     }
 
 }

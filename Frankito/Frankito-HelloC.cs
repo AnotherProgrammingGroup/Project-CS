@@ -8,7 +8,6 @@ namespace HelloC
     public class Program
     {
         public static void Main(string[] args)
-		hihihihihihihhihihihihihihihhhi
         {
             Rectangle square = new Rectangle();
             //test

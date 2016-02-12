@@ -8,6 +8,7 @@ namespace HelloC
     public class Program
     {
         public static void Main(string[] args)
+		hihihihihihihhihihihihihihihhhi
         {
             Rectangle square = new Rectangle();
             square.Area(4, 4);

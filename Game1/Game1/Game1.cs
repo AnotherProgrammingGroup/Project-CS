@@ -11,6 +11,8 @@ namespace Game1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D pepe;
+        Vector2 pos;
 
         public Game1()
         {
@@ -41,6 +43,8 @@ namespace Game1
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            pepe = this.Content.Load<Texture2D>("pepe.jpg");
+            pos = new Vector2(100, 100);
         }
 
         /// <summary>
@@ -62,9 +66,24 @@ namespace Game1
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            input();
+
             // TODO: Add your update logic here
 
             base.Update(gameTime);
+        }
+
+        private void input()
+        {
+            float speed = 5f;
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+                pos.Y -= speed;
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+                pos.Y += speed;
+            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+                pos.X -= speed;
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+                pos.X += speed;
         }
 
         /// <summary>
@@ -76,6 +95,9 @@ namespace Game1
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+            spriteBatch.Draw(pepe, pos, null, null, null, 0, new Vector2(0.5f, 0.5f), null, SpriteEffects.None, 0);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

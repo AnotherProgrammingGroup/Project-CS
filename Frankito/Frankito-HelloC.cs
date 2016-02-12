@@ -10,7 +10,6 @@ namespace HelloC
         public static void Main(string[] args)
         {
             Rectangle square = new Rectangle();
-            //test
             square.Area(4, 4);
             Triangle right = new Triangle();
             right.Area(4, 4);

@@ -11,6 +11,7 @@ namespace HelloC
 		hihihihihihihhihihihihihihihhhi
         {
             Rectangle square = new Rectangle();
+            //test
             square.Area(4, 4);
             Triangle right = new Triangle();
             right.Area(4, 4);

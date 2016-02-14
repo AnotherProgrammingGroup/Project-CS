@@ -11,10 +11,12 @@ namespace Game1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D backgroundTexture;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
         }
 
@@ -39,6 +41,10 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            this.backgroundTexture = this.Content.Load<Texture2D>(@"background");
+            this.graphics.PreferredBackBufferWidth = this.backgroundTexture.Width;
+            this.graphics.PreferredBackBufferHeight = this.backgroundTexture.Height;
+            this.graphics.ApplyChanges();
 
             // TODO: use this.Content to load your game content here
         }
@@ -73,10 +79,11 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
             // TODO: Add your drawing code here
-
+            GraphicsDevice.Clear(Color.Green);
+            this.spriteBatch.Begin();
+            this.spriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, backgroundTexture.Width, backgroundTexture.Height), Color.White);
+            this.spriteBatch.End();
             base.Draw(gameTime);
         }
     }

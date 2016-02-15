@@ -41,3 +41,6 @@ _ReSharper*/
 
 # Office Temp Files
 ~$*
+
+#Visual Studio Caches
+.vs/

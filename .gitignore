@@ -42,5 +42,7 @@ _ReSharper*/
 # Office Temp Files
 ~$*
 
-#Visual Studio Caches
+#Visual Studio Directories
 .vs/
+obj/
+Game1/packages/

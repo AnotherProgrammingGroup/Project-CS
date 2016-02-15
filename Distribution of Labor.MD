@@ -9,21 +9,7 @@
 ##Frankito
 
 ##jugg
-1. Come back to the IRC!
-
-##niceflan
-1. Come back to the IRC!
 
 ##CaveStory
-1. Come back to the IRC!
-
-##rezzoSh
-1. Come back to the IRC!
 
 ##hacksoi
-
-##Jelly
-1. Come back to the IRC!
-
-##Cinnamon
-1. Come back to the IRC!

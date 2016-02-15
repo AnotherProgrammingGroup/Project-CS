@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using TiledSharp;
 
 namespace Game1
 {
@@ -11,12 +13,18 @@ namespace Game1
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D backgroundTexture;
+
+        TmxMap map;
+        Texture2D tileset;
+
+        int tileWidth;
+        int tileHeight;
+        int tilesetTilesWide;
+        int tilesetTilesHigh;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
         }
 
@@ -41,12 +49,15 @@ namespace Game1
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            this.backgroundTexture = this.Content.Load<Texture2D>(@"background");
-            this.graphics.PreferredBackBufferWidth = this.backgroundTexture.Width;
-            this.graphics.PreferredBackBufferHeight = this.backgroundTexture.Height;
-            this.graphics.ApplyChanges();
 
-            // TODO: use this.Content to load your game content here
+            map = new TmxMap("Content/test.tmx");
+            tileset = Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
+
+            tileWidth = map.Tilesets[0].TileWidth;
+            tileHeight = map.Tilesets[0].TileHeight;
+
+            tilesetTilesWide = tileset.Width / tileWidth;
+            tilesetTilesHigh = tileset.Height / tileHeight;
         }
 
         /// <summary>
@@ -68,8 +79,6 @@ namespace Game1
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-
             base.Update(gameTime);
         }
 
@@ -79,11 +88,35 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // TODO: Add your drawing code here
-            GraphicsDevice.Clear(Color.Green);
-            this.spriteBatch.Begin();
-            this.spriteBatch.Draw(backgroundTexture, new Rectangle(0, 0, backgroundTexture.Width, backgroundTexture.Height), Color.White);
-            this.spriteBatch.End();
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            spriteBatch.Begin();
+
+            for (var i = 0; i < map.Layers[0].Tiles.Count; i++)
+            {
+                int gid = map.Layers[0].Tiles[i].Gid;
+
+                // Empty tile, do nothing
+                if (gid == 0)
+                {
+
+                }
+                else {
+                    int tileFrame = gid - 1;
+                    int column = tileFrame % tilesetTilesWide;
+                    int row = (tileFrame + 1 > tilesetTilesWide) ? tileFrame - column * tilesetTilesWide : 0;
+
+                    float x = (i % map.Width) * map.TileWidth;
+                    float y = (float)Math.Floor(i / (double)map.Width) * map.TileHeight;
+
+                    Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
+
+                    spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White);
+                }
+            }
+
+            spriteBatch.End();
+
             base.Draw(gameTime);
         }
     }

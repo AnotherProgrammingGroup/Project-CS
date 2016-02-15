@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using TiledSharp;
 
 namespace Game1
@@ -15,12 +16,7 @@ namespace Game1
         SpriteBatch spriteBatch;
 
         TmxMap map;
-        Texture2D tileset;
-
-        int tileWidth;
-        int tileHeight;
-        int tilesetTilesWide;
-        int tilesetTilesHigh;
+        List<Texture2D> tilesetTextures;
 
         public Game1()
         {
@@ -51,13 +47,11 @@ namespace Game1
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             map = new TmxMap("Content/test.tmx");
-            tileset = Content.Load<Texture2D>(map.Tilesets[0].Name.ToString());
-
-            tileWidth = map.Tilesets[0].TileWidth;
-            tileHeight = map.Tilesets[0].TileHeight;
-
-            tilesetTilesWide = tileset.Width / tileWidth;
-            tilesetTilesHigh = tileset.Height / tileHeight;
+            tilesetTextures = new List<Texture2D>();
+            foreach (var tileset in map.Tilesets)
+            {
+                tilesetTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
+            }
         }
 
         /// <summary>
@@ -88,30 +82,43 @@ namespace Game1
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
             spriteBatch.Begin();
 
-            for (var i = 0; i < map.Layers[0].Tiles.Count; i++)
+            foreach (var layer in map.Layers)
             {
-                int gid = map.Layers[0].Tiles[i].Gid;
-
-                // Empty tile, do nothing
-                if (gid == 0)
+                int tileIdx = 0;
+                foreach (var tile in layer.Tiles)
                 {
+                    int tilesetIdx = 0;
+                    foreach (var tileset in map.Tilesets)
+                    {
+                        if (tileset.FirstGid <= tile.Gid && tile.Gid < tileset.FirstGid + tileset.TileCount)
+                        {
+                            Texture2D texture = tilesetTextures[tilesetIdx];
+                            //tileWidth and tileHeight are in pixels
+                            int tileWidth = tileset.TileWidth, tileHeight = tileset.TileHeight;
+                            //tilesetWidth measure number of tiles across
+                            int tilesetWidth = texture.Width / tileWidth;
 
-                }
-                else {
-                    int tileFrame = gid - 1;
-                    int column = tileFrame % tilesetTilesWide;
-                    int row = (tileFrame + 1 > tilesetTilesWide) ? tileFrame - column * tilesetTilesWide : 0;
+                            int textureID = tile.Gid - tileset.FirstGid;
+                            int row = (textureID) / tilesetWidth;
+                            int column = (textureID) % tilesetWidth;
+                            Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
 
-                    float x = (i % map.Width) * map.TileWidth;
-                    float y = (float)Math.Floor(i / (double)map.Width) * map.TileHeight;
+                            int x = (tileIdx % map.Width) * map.TileWidth;
+                            int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;
+                            //At this point in time, (x, y) represents bottom left corner of map tile
+                            y -= tileHeight - 1;
+                            //Now (x,y) represents top left corner of image tile
+                            //Note that image tile represents the image being drawn,
+                            //which can be a different size than the map tiles.
+                            spriteBatch.Draw(texture, new Rectangle(x, y, tileWidth, tileHeight), tilesetRec, Color.White);
 
-                    Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
-
-                    spriteBatch.Draw(tileset, new Rectangle((int)x, (int)y, tileWidth, tileHeight), tilesetRec, Color.White);
+                            break;
+                        }
+                        ++tilesetIdx;
+                    }
+                    ++tileIdx;
                 }
             }
 

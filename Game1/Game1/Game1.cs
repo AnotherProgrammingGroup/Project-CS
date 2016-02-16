@@ -102,12 +102,12 @@ namespace Game1
                             //tileWidth and tileHeight are in pixels
                             int tileWidth = tileset.TileWidth, tileHeight = tileset.TileHeight;
                             //tilesetWidth measure number of tiles across
-                            int tilesetWidth = texture.Width / tileWidth;
+                            int tilesetWidth = texture.Width / (tileWidth + tileset.Spacing);
 
                             int textureID = tile.Gid - tileset.FirstGid;
                             int row = (textureID) / tilesetWidth;
                             int column = (textureID) % tilesetWidth;
-                            Rectangle tilesetRec = new Rectangle(tileWidth * column, tileHeight * row, tileWidth, tileHeight);
+                            Rectangle tilesetRec = new Rectangle(tileWidth * column + column * tileset.Spacing, tileHeight * row + row * tileset.Spacing, tileWidth, tileHeight);
 
                             int x = (tileIdx % map.Width) * map.TileWidth;
                             int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;

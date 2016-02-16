@@ -21,6 +21,11 @@ namespace Game1
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+
+            map = new TmxMap("Content/test.tmx");
+            graphics.PreferredBackBufferWidth = map.Width * map.TileWidth;
+            graphics.PreferredBackBufferHeight = map.Height * map.TileHeight;
+
             Content.RootDirectory = "Content";
         }
 
@@ -46,7 +51,6 @@ namespace Game1
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            map = new TmxMap("Content/test.tmx");
             tilesetTextures = new List<Texture2D>();
             foreach (var tileset in map.Tilesets)
             {

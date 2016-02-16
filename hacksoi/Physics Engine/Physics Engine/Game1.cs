@@ -21,7 +21,7 @@ namespace Physics_Engine
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-
+            
             map = new TmxMap("Content/test.tmx");
             graphics.PreferredBackBufferWidth = map.Width * map.TileWidth;
             graphics.PreferredBackBufferHeight = map.Height * map.TileHeight;
@@ -110,9 +110,9 @@ namespace Physics_Engine
                             Rectangle tilesetRec = new Rectangle(tileWidth * column + column * tileset.Spacing, tileHeight * row + row * tileset.Spacing, tileWidth, tileHeight);
 
                             int x = (tileIdx % map.Width) * map.TileWidth;
-                            int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;
+                            int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight;
                             //At this point in time, (x, y) represents bottom left corner of map tile
-                            y -= tileHeight - 1;
+                            y -= tileHeight;
                             //Now (x,y) represents top left corner of image tile
                             //Note that image tile represents the image being drawn,
                             //which can be a different size than the map tiles.

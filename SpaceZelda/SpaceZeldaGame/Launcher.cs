@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Game
+namespace SpaceZeldaGame
 {
 #if WINDOWS || LINUX
     /// <summary>

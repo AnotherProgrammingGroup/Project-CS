@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using TiledSharp;
 
-namespace Game
+namespace SpaceZeldaGame
 {
     /// <summary>
     /// This is the main type for your game.
@@ -17,6 +17,8 @@ namespace Game
 
         TmxMap map;
         List<Texture2D> tilesetTextures;
+
+        private AnimatedSprite animatedSprite;
 
         public Game()
         {
@@ -56,6 +58,9 @@ namespace Game
             {
                 tilesetTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
             }
+
+            Texture2D texture = Content.Load<Texture2D>("Sprite1");
+            animatedSprite = new AnimatedSprite(texture, 4, 4);
         }
 
         /// <summary>
@@ -78,6 +83,8 @@ namespace Game
                 Exit();
 
             base.Update(gameTime);
+
+            animatedSprite.Update();
         }
 
         /// <summary>
@@ -126,6 +133,7 @@ namespace Game
                 }
             }
 
+            animatedSprite.Draw(spriteBatch, new Vector2(400, 200));
             spriteBatch.End();
 
             base.Draw(gameTime);

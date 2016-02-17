@@ -15,18 +15,19 @@ namespace SpaceZeldaGame
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        TmxMap map;
-        List<Texture2D> tilesetTextures;
+        TiledMap tiledMap;
 
-        private AnimatedSprite animatedSprite;
+        AnimatedSprite animatedSprite;
+
+        Matrix view;
+        Vector2 screenCenter;
+        Vector2 camera;
 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
-
-            map = new TmxMap("Content/test.tmx");
-            graphics.PreferredBackBufferWidth = map.Width * map.TileWidth;
-            graphics.PreferredBackBufferHeight = map.Height * map.TileHeight;
+            graphics.PreferredBackBufferWidth = 480;
+            graphics.PreferredBackBufferHeight = 320;
 
             Content.RootDirectory = "Content";
         }
@@ -39,8 +40,9 @@ namespace SpaceZeldaGame
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
+            view = Matrix.Identity;
+            camera = Vector2.Zero;
+            screenCenter = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f);
             base.Initialize();
         }
 
@@ -53,11 +55,7 @@ namespace SpaceZeldaGame
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            tilesetTextures = new List<Texture2D>();
-            foreach (var tileset in map.Tilesets)
-            {
-                tilesetTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
-            }
+            tiledMap = new TiledMap(Content, "Content/test.tmx");
 
             Texture2D texture = Content.Load<Texture2D>("Sprite1");
             animatedSprite = new AnimatedSprite(texture, 4, 4);
@@ -79,12 +77,36 @@ namespace SpaceZeldaGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            KeyboardState state = Keyboard.GetState();
 
-            base.Update(gameTime);
+            if (state.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+            }
+
+            if (state.IsKeyDown(Keys.Left))
+            {
+                camera.X += 1.5f;
+            }
+            if (state.IsKeyDown(Keys.Right))
+            {
+                camera.X -= 1.5f;
+            }
+            if (state.IsKeyDown(Keys.Up))
+            {
+                camera.Y += 1.5f;
+            }
+            if (state.IsKeyDown(Keys.Down))
+            {
+                camera.Y -= 1.5f;
+            }
+
+            view = Matrix.CreateTranslation(
+                new Vector3(camera - screenCenter, 0f)) * Matrix.CreateTranslation(new Vector3(screenCenter, 0f));
 
             animatedSprite.Update();
+
+            base.Update(gameTime);
         }
 
         /// <summary>
@@ -93,47 +115,11 @@ namespace SpaceZeldaGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            foreach (var layer in map.Layers)
-            {
-                int tileIdx = 0;
-                foreach (var tile in layer.Tiles)
-                {
-                    int tilesetIdx = 0;
-                    foreach (var tileset in map.Tilesets)
-                    {
-                        if (tileset.FirstGid <= tile.Gid && tile.Gid < tileset.FirstGid + tileset.TileCount)
-                        {
-                            Texture2D texture = tilesetTextures[tilesetIdx];
-                            //tileWidth and tileHeight are in pixels
-                            int tileWidth = tileset.TileWidth, tileHeight = tileset.TileHeight;
-                            //tilesetWidth measure number of tiles across
-                            int tilesetWidth = texture.Width / (tileWidth + tileset.Spacing);
-
-                            int textureID = tile.Gid - tileset.FirstGid;
-                            int row = (textureID) / tilesetWidth;
-                            int column = (textureID) % tilesetWidth;
-                            Rectangle tilesetRec = new Rectangle(tileWidth * column + column * tileset.Spacing, tileHeight * row + row * tileset.Spacing, tileWidth, tileHeight);
-
-                            int x = (tileIdx % map.Width) * map.TileWidth;
-                            int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;
-                            //At this point in time, (x, y) represents bottom left corner of map tile
-                            y -= tileHeight - 1;
-                            //Now (x,y) represents top left corner of image tile
-                            //Note that image tile represents the image being drawn,
-                            //which can be a different size than the map tiles.
-                            spriteBatch.Draw(texture, new Rectangle(x, y, tileWidth, tileHeight), tilesetRec, Color.White);
-
-                            break;
-                        }
-                        ++tilesetIdx;
-                    }
-                    ++tileIdx;
-                }
-            }
-
-            animatedSprite.Draw(spriteBatch, new Vector2(400, 200));
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, view);
+            tiledMap.Draw(spriteBatch);
+            animatedSprite.Draw(spriteBatch, (new Vector2(400, 200)));
             spriteBatch.End();
 
             base.Draw(gameTime);

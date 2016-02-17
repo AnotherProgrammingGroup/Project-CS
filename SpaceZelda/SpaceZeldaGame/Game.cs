@@ -18,7 +18,16 @@ namespace Game
         TmxMap map;
         List<Texture2D> tilesetTextures;
 
-        private AnimatedSprite animatedSprite;
+        public Game()
+        {
+            graphics = new GraphicsDeviceManager(this);
+
+            map = new TmxMap("Content/test.tmx");
+            graphics.PreferredBackBufferWidth = map.Width * map.TileWidth;
+            graphics.PreferredBackBufferHeight = map.Height * map.TileHeight;
+
+            Content.RootDirectory = "Content";
+        }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -47,9 +56,6 @@ namespace Game
             {
                 tilesetTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
             }
-
-            Texture2D texture = Content.Load<Texture2D>("TextureAtlas");
-            animatedSprite = new AnimatedSprite(texture, 4, 4);
         }
 
         /// <summary>
@@ -72,8 +78,6 @@ namespace Game
                 Exit();
 
             base.Update(gameTime);
-
-            animatedSprite.Update();
         }
 
         /// <summary>
@@ -122,7 +126,6 @@ namespace Game
                 }
             }
 
-            animatedSprite.Draw(spriteBatch, new Vector2(400, 200));
             spriteBatch.End();
 
             base.Draw(gameTime);

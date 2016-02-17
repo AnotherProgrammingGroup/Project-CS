@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using TiledSharp;
 
-namespace Game1
+namespace Game
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -18,7 +18,7 @@ namespace Game1
         TmxMap map;
         List<Texture2D> tilesetTextures;
 
-        public Game1()
+        public Game()
         {
             graphics = new GraphicsDeviceManager(this);
 

@@ -8,8 +8,8 @@
     <ProjectGuid>{13114EBC-54D0-4B46-B892-C8203099AA26}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Game1</RootNamespace>
-    <AssemblyName>Game1</AssemblyName>
+    <RootNamespace>SpaceZeldaGame</RootNamespace>
+    <AssemblyName>SpaceZeldaGame</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <MonoGameContentBuilderExe>
@@ -38,8 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="Launcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

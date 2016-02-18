@@ -49,10 +49,10 @@ namespace SpaceZeldaGame
 
         public void Draw(SpriteBatch spriteBatch, Vector2 location)
         {
-            int row = (int)((float)currentFrame / (float)Columns);
+            int row = currentFrame / Columns;
             int column = currentFrame % Columns;
 
-            Rectangle sourceRectangle = new Rectangle(Width * column, Height * row, Width, Height);
+            Rectangle sourceRectangle = new Rectangle(Width * column + 1, Height * row + 1, Width - 1, Height - 1);
             Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, Width, Height);
 
             spriteBatch.Draw(Texture, destinationRectangle, sourceRectangle, Color.White);

@@ -7,9 +7,6 @@ using TiledSharp;
 
 namespace SpaceZeldaGame
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
@@ -52,7 +49,6 @@ namespace SpaceZeldaGame
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             tiledMap = new TiledMap(Content, "Content/test.tmx");

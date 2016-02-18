@@ -12,34 +12,48 @@ namespace SpaceZeldaGame
         public Texture2D Texture { get; set; }
         public int Rows { get; set; }
         public int Columns { get; set; }
+        public int Height { get; set; }
+        public int Width { get; set; }
+        public int MillisecondsPerFrame { get; set; }
+
         private int currentFrame;
         private int totalFrames;
+        private int timeSinceLastFrame = 0;
 
-        public AnimatedSprite(Texture2D texture, int rows, int columns)
+
+        public AnimatedSprite(Texture2D texture, int rows, int columns, int milliseconds)
         {
             Texture = texture;
             Rows = rows;
             Columns = columns;
+            Height = texture.Height / rows;
+            Width = texture.Width / columns;
+            MillisecondsPerFrame = milliseconds;
             currentFrame = 0;
             totalFrames = Rows * Columns;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
-            currentFrame++;
-            if (currentFrame == totalFrames)
-                currentFrame = 0;
+            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
+            if (timeSinceLastFrame > MillisecondsPerFrame)
+            {
+                ++currentFrame;
+                if (currentFrame == totalFrames)
+                {
+                    currentFrame = 0;
+                }
+                timeSinceLastFrame = 0;
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, Vector2 location)
         {
-            int width = Texture.Width / Columns;
-            int height = Texture.Height / Rows;
             int row = (int)((float)currentFrame / (float)Columns);
             int column = currentFrame % Columns;
 
-            Rectangle sourceRectangle = new Rectangle(width * column, height * row, width, height);
-            Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, width, height);
+            Rectangle sourceRectangle = new Rectangle(Width * column, Height * row, Width, Height);
+            Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, Width, Height);
 
             spriteBatch.Draw(Texture, destinationRectangle, sourceRectangle, Color.White);
         }

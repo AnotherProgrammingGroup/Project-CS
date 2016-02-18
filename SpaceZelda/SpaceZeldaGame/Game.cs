@@ -143,9 +143,9 @@ namespace SpaceZeldaGame
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, view);
+            tiledMap.Draw(spriteBatch);
             playerSprite.Draw(spriteBatch, ConvertUnits.ToDisplayUnits(playerBody.Position) - playerOrigin);
             spriteBatch.Draw(groundSprite, ConvertUnits.ToDisplayUnits(groundBody.Position), null, Color.White, 0f, groundOrigin, 1f, SpriteEffects.None, 0f);
-            tiledMap.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

@@ -74,7 +74,7 @@ namespace Game1
             _debugView = new DebugViewXNA(_world);
             _debugView.LoadContent(_graphics.GraphicsDevice, Content);
 
-            List<TmxMapUtil.TmxObjectBody> objectBodies = TmxMapUtil.InsertObjects(_map.Map, _world);
+            List<MapWorldUtil.TmxObjectBody> objectBodies = MapWorldUtil.InsertObjects(_map.Map, _world);
             foreach (var objBod in objectBodies)
             {
                 if(objBod.TmxObject.Name.Equals("Player"))

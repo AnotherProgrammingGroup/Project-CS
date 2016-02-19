@@ -9,7 +9,7 @@ using FarseerPhysics.Common.Decomposition;
 
 namespace Util
 {
-    class TmxMapUtil
+    class MapWorldUtil
     {
         public struct TmxObjectBody
         {

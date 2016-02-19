@@ -69,7 +69,6 @@ namespace SpaceZeldaGame
             view = Matrix.CreateTranslation(
                 new Vector3(camera - screenCenter, 0f)) * Matrix.CreateTranslation(new Vector3(screenCenter, 0f));
 
-
             player.Update(gameTime);
             base.Update(gameTime);
         }

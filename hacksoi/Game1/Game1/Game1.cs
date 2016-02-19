@@ -7,6 +7,7 @@ using FarseerPhysics;
 using FarseerPhysics.DebugView;
 using System.Collections.Generic;
 using TiledSharp;
+using TiledSharpUtil;
 using System;
 using FarseerPhysics.Common;
 using FarseerPhysics.Common.Decomposition;
@@ -96,7 +97,7 @@ namespace Game1
                 _tilesetTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
             }
 
-            TiledSharpUtil.InsertObjects(_map, _world);
+            TmxMapUtil.InsertObjects(_map, _world);
         }
 
         protected override void Update(GameTime gameTime)

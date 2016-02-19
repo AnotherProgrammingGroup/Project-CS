@@ -14,6 +14,11 @@ namespace TiledSharpUtil
 {
     class TmxMapUtil
     {
+        public static string[] BodyProperties = new string[]
+        {
+                "BodyType", "Density", "FixedRotation", "Friction", "Mass", "Restitution",  "Rotation"
+        };
+
         /// <summary>
         /// Inserts all objects from <paramref name="map"/> into <paramref name="world"/>.
         /// </summary>
@@ -29,11 +34,53 @@ namespace TiledSharpUtil
                 foreach (var obj in objLayer.Objects)
                 {
                     float density = 1f;
-                    string densityStr = obj.Properties["Density"];
-                    if (densityStr.Length != 0);
+                    string densityStr;
+                    bool foundDensity = obj.Properties.TryGetValue("Density", out densityStr);
+                    if (foundDensity)
                         density = float.Parse(densityStr);
+
                     Body body = Insert(obj, density, world);
+
+                    foreach (var property in BodyProperties)
+                    {
+                        string value;
+                        obj.Properties.TryGetValue(property, out value);
+                        SetProperty(property, value, body);
+                    }
                 }
+            }
+        }
+
+        private static void SetProperty(string property, string value, Body body)
+        {
+            bool realValue = value != null;
+            if (property.Equals("BodyType"))
+            {
+                if (value.Equals("Kinematic"))
+                    body.BodyType = BodyType.Kinematic;
+                else if (value.Equals("Dynamic"))
+                    body.BodyType = BodyType.Dynamic;
+            } else if (property.Equals("FixedRotation"))
+            {
+                    body.FixedRotation = value.Equals("True");
+            } else if (property.Equals("Friction"))
+            {
+                if (realValue)
+                    body.Friction = float.Parse(value);
+                else
+                    body.Friction = 0.5f;
+            } else if (property.Equals("Mass"))
+            {
+                if (realValue)
+                    body.Mass = float.Parse(value);
+            } else if (property.Equals("Restitution"))
+            {
+                if (realValue)
+                    body.Restitution = float.Parse(value);
+            } else if (property.Equals("Rotation"))
+            {
+                if (realValue)
+                    body.Rotation = float.Parse(value);
             }
         }
 

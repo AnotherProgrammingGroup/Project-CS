@@ -3,33 +3,35 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using TiledSharp;
+using System;
 
 namespace SpaceZeldaGame
 {
     public class TiledMap
     {
-        TmxMap map;
-        List<Texture2D> mapTextures;
+        public TmxMap Map { get; set; }
+
+        private List<Texture2D> mapTextures;
 
         public TiledMap(ContentManager Content, string mapLocation)
         {
-            map = new TmxMap(mapLocation);
+            Map = new TmxMap(mapLocation);
             mapTextures = new List<Texture2D>();
-            foreach (var tileset in map.Tilesets)
+            foreach (var tileset in Map.Tilesets)
             {
-                mapTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
+                mapTextures.Add(Content.Load<Texture2D>(tileset.Name));
             }
         }
-		// TODO: Implement drawing of Tile objects in the Object Layers
+
         public void Draw(SpriteBatch spriteBatch)
         {
-            foreach (var layer in map.Layers)
+            foreach (var layer in Map.Layers)
             {
                 int tileIdx = 0;
                 foreach (var tile in layer.Tiles)
                 {
                     int tilesetIdx = 0;
-                    foreach (var tileset in map.Tilesets)
+                    foreach (var tileset in Map.Tilesets)
                     {
                         if (tileset.FirstGid <= tile.Gid && tile.Gid < tileset.FirstGid + tileset.TileCount)
                         {
@@ -47,16 +49,16 @@ namespace SpaceZeldaGame
                                               tileHeight * row + row * tileset.Spacing, 
                                               tileWidth, tileHeight);
 
-                            int x = (tileIdx % map.Width) * map.TileWidth;
-                            int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;
-                            //At this point in time, (x, y) represents bottom left corner of map tile
+                            int x = (tileIdx % Map.Width) * Map.TileWidth;
+                            int y = (tileIdx / Map.Width) * Map.TileHeight + Map.TileHeight - 1;
+                            //At this point in time, (x, y) represents bottom left corner of Map tile
                             y -= tileHeight - 1;
                             Rectangle destinationRectangle = 
                                 new Rectangle(x, y, tileWidth, tileHeight);
 
                             //Now (x,y) represents top left corner of image tile
                             //Note that image tile represents the image being drawn,
-                            //which can be a different size than the map tiles.
+                            //which can be a different size than the Map tiles.
                             spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, Color.White);
 
                             break;

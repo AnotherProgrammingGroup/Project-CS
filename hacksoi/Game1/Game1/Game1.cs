@@ -1,17 +1,12 @@
 ﻿using FarseerPhysics.Dynamics;
-using FarseerPhysics.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using FarseerPhysics;
 using FarseerPhysics.DebugView;
 using System.Collections.Generic;
-using TiledSharp;
-using TiledSharpUtil;
-using System;
-using FarseerPhysics.Common;
-using FarseerPhysics.Common.Decomposition;
-using FarseerPhysics.Collision.Shapes;
+using Util;
+using SpaceZeldaGame;
 
 // TODO: Add zoom feature (_view * _scale)
 
@@ -24,52 +19,41 @@ namespace Game1
         private KeyboardState _oldKeyState;
         private SpriteFont _font;
 
-        private World _world;
-
-        private Body _circleBody;
-
-        // Simple camera controls
         private Matrix _projection;
         private Matrix _view;
         private Vector2 _cameraPosition;
         private Vector2 _screenCenter;
 
+        private World _world;
+
+        private Body _playerBody;
+
         private DebugViewXNA _debugView;
 
         private BasicEffect _basicEffect;
 
-        private TmxMap _map;
-        private List<Texture2D> _tilesetTextures;
+        private TiledMap _map;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
 
-            _map = new TmxMap("Content/test.tmx");
-            _graphics.PreferredBackBufferWidth = _map.Width * _map.TileWidth;
-            _graphics.PreferredBackBufferHeight = _map.Height * _map.TileHeight;
-
             Content.RootDirectory = "Content";
-
-            //Create a world with gravity.
-            _world = new World(new Vector2(0, 9.82f));
-            _debugView = new DebugViewXNA(_world);
         }
 
         protected override void LoadContent()
         {
-            // Farseer expects objects to be scaled to MKS (meters, kilos, seconds)
-            // 1 meters equals 64 pixels here
-            ConvertUnits.SetDisplayUnitToSimUnitRatio(64f);
+            _map = new TiledMap(Content, "Content/test.tmx");
 
-            // Initialize camera controls
+            _graphics.PreferredBackBufferWidth = _map.Map.Width * _map.Map.TileWidth;
+            _graphics.PreferredBackBufferHeight = _map.Map.Height * _map.Map.TileHeight;
+            _graphics.ApplyChanges();
+            
             _projection = Matrix.CreateOrthographicOffCenter(0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight, 0, 0.1f, 1000f);
             _view = Matrix.Identity;
             _cameraPosition = Vector2.Zero;
             _screenCenter = new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2f, _graphics.GraphicsDevice.Viewport.Height / 2f);
             _batch = new SpriteBatch(_graphics.GraphicsDevice);
-
-            _debugView.LoadContent(_graphics.GraphicsDevice, Content);
 
             _basicEffect = new BasicEffect(_graphics.GraphicsDevice);
             _basicEffect.Projection = _projection;
@@ -79,32 +63,32 @@ namespace Game1
 
             _font = Content.Load<SpriteFont>("Font");
 
-            /* Circle */
-            // Convert screen center from pixels to meters
-            Vector2 circlePosition = ConvertUnits.ToSimUnits(_screenCenter) + new Vector2(0, -1.5f);
+            LoadWorld();
+        }
 
-            // Create the circle fixture
-            _circleBody = BodyFactory.CreateCircle(_world, ConvertUnits.ToSimUnits(48 / 2f), 1f, circlePosition);
-            _circleBody.BodyType = BodyType.Dynamic;
+        private void LoadWorld()
+        {
+            ConvertUnits.SetDisplayUnitToSimUnitRatio(64f);
 
-            // Give it some bounce and friction
-            _circleBody.Restitution = 0.3f;
-            _circleBody.Friction = 0.5f;
+            _world = new World(new Vector2(0, 9.81f));
+            _debugView = new DebugViewXNA(_world);
+            _debugView.LoadContent(_graphics.GraphicsDevice, Content);
 
-            _tilesetTextures = new List<Texture2D>();
-            foreach (var tileset in _map.Tilesets)
+            List<TmxMapUtil.TmxObjectBody> objectBodies = TmxMapUtil.InsertObjects(_map.Map, _world);
+            foreach (var objBod in objectBodies)
             {
-                _tilesetTextures.Add(Content.Load<Texture2D>(tileset.Name.ToString()));
+                if(objBod.TmxObject.Name.Equals("Player"))
+                {
+                    _playerBody = objBod.Body;
+                    break;
+                }
             }
-
-            TmxMapUtil.InsertObjects(_map, _world);
         }
 
         protected override void Update(GameTime gameTime)
         {
             HandleKeyboard();
-
-            //We update the world
+            
             _world.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f);
 
             base.Update(gameTime);
@@ -113,8 +97,7 @@ namespace Game1
         private void HandleKeyboard()
         {
             KeyboardState state = Keyboard.GetState();
-
-            // Move camera
+            
             float cameraSpeed = 3.5f;
             if (state.IsKeyDown(Keys.Left))
                 _cameraPosition.X += cameraSpeed;
@@ -130,15 +113,15 @@ namespace Game1
 
             _view = Matrix.CreateTranslation(new Vector3(_cameraPosition, -1f));
 
-            // We make it possible to rotate the circle body
+            float torqueAmt = 2;
             if (state.IsKeyDown(Keys.A))
-                _circleBody.ApplyTorque(-10);
+                _playerBody.ApplyTorque(-torqueAmt);
 
             if (state.IsKeyDown(Keys.D))
-                _circleBody.ApplyTorque(10);
+                _playerBody.ApplyTorque(torqueAmt);
 
             if (state.IsKeyDown(Keys.Space) && _oldKeyState.IsKeyUp(Keys.Space))
-                _circleBody.ApplyLinearImpulse(new Vector2(0, -10));
+                _playerBody.ApplyLinearImpulse(new Vector2(0, -2.5f));
 
             if (state.IsKeyDown(Keys.Escape))
                 Exit();
@@ -153,48 +136,11 @@ namespace Game1
             _basicEffect.View = _view;
 
             _batch.Begin(SpriteSortMode.Deferred, null, null, null, null, _basicEffect, null);
-
-            foreach (var layer in _map.Layers)
-            {
-                int tileIdx = 0;
-                foreach (var tile in layer.Tiles)
-                {
-                    int tilesetIdx = 0;
-                    foreach (var tileset in _map.Tilesets)
-                    {
-                        if (tileset.FirstGid <= tile.Gid && tile.Gid < tileset.FirstGid + tileset.TileCount)
-                        {
-                            Texture2D texture = _tilesetTextures[tilesetIdx];
-                            //tileWidth and tileHeight are in pixels
-                            int tileWidth = tileset.TileWidth, tileHeight = tileset.TileHeight;
-                            //tilesetWidth measure number of tiles across
-                            int tilesetWidth = texture.Width / (tileWidth + tileset.Spacing);
-
-                            int textureID = tile.Gid - tileset.FirstGid;
-                            int row = (textureID) / tilesetWidth;
-                            int column = (textureID) % tilesetWidth;
-                            Rectangle tilesetRec = new Rectangle(tileWidth * column + column * tileset.Spacing, tileHeight * row + row * tileset.Spacing, tileWidth, tileHeight);
-
-                            int x = (tileIdx % _map.Width) * _map.TileWidth;
-                            int y = (tileIdx / _map.Width) * _map.TileHeight + _map.TileHeight;
-                            //At this point in time, (x, y) represents bottom left corner of map tile
-                            y -= tileHeight;
-                            //Now (x,y) represents top left corner of image tile
-                            //Note that image tile represents the image being drawn,
-                            //which can be a different size than the map tiles.
-                            _batch.Draw(texture, new Rectangle(x, y, tileWidth, tileHeight), tilesetRec, Color.White);
-
-                            break;
-                        }
-                        ++tilesetIdx;
-                    }
-                    ++tileIdx;
-                }
-            }
-
+            _map.Draw(_batch);
             _batch.End();
 
-            Matrix debugProjection = Matrix.CreateOrthographicOffCenter(0, ConvertUnits.ToSimUnits(_graphics.PreferredBackBufferWidth), ConvertUnits.ToSimUnits(_graphics.PreferredBackBufferHeight), 0, ConvertUnits.ToSimUnits(0.1f), ConvertUnits.ToSimUnits(1000f));
+            Matrix debugProjection = Matrix.CreateOrthographicOffCenter(0, ConvertUnits.ToSimUnits(_graphics.PreferredBackBufferWidth), 
+                ConvertUnits.ToSimUnits(_graphics.PreferredBackBufferHeight), 0, ConvertUnits.ToSimUnits(0.1f), ConvertUnits.ToSimUnits(1000f));
             Matrix debugView = Matrix.CreateTranslation(ConvertUnits.ToSimUnits(new Vector3(_cameraPosition, -1f)));
             _debugView.RenderDebugData(debugProjection, debugView);
 

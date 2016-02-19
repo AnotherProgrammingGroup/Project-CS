@@ -473,7 +473,6 @@ namespace FarseerPhysics.DebugView
                     }
                     break;
 
-
                 case ShapeType.Edge:
                     {
                         EdgeShape edge = (EdgeShape)fixture.Shape;
@@ -486,7 +485,7 @@ namespace FarseerPhysics.DebugView
                 case ShapeType.Chain:
                     {
                         ChainShape chain = (ChainShape)fixture.Shape;
-
+                        
                         for (int i = 0; i < chain.Vertices.Count - 1; ++i)
                         {
                             Vector2 v1 = MathUtils.Mul(ref xf, chain.Vertices[i]);
@@ -617,7 +616,7 @@ namespace FarseerPhysics.DebugView
         {
             if (!_primitiveBatch.IsReady())
                 throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
-
+            
             _primitiveBatch.AddVertex(start, color, PrimitiveType.LineList);
             _primitiveBatch.AddVertex(end, color, PrimitiveType.LineList);
         }

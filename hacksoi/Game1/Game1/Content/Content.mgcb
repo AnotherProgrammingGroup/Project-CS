@@ -41,7 +41,7 @@
 /processorParam:TextureFormat=Compressed
 /build:Font.spritefont
 
-#begin background.jpg
+#begin Background.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -50,9 +50,9 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:TextureFormat=Color
-/build:background.jpg
+/build:Background.jpg
 
-#begin mario.png
+#begin TileSet 1.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -61,5 +61,5 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:TextureFormat=Color
-/build:mario.png
+/build:TileSet 1.png
 

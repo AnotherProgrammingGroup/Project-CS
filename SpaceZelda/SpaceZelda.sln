@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceZeldaGame", "SpaceZeldaGame\SpaceZeldaGame.csproj", "{13114EBC-54D0-4B46-B892-C8203099AA26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugView MonoGame", "Farseer Physics DebugView 3.5\DebugView MonoGame.csproj", "{566F1803-90B5-4947-8730-57F092FBB002}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{13114EBC-54D0-4B46-B892-C8203099AA26}.Debug|x86.Build.0 = Debug|x86
 		{13114EBC-54D0-4B46-B892-C8203099AA26}.Release|x86.ActiveCfg = Release|x86
 		{13114EBC-54D0-4B46-B892-C8203099AA26}.Release|x86.Build.0 = Release|x86
+		{566F1803-90B5-4947-8730-57F092FBB002}.Debug|x86.ActiveCfg = Debug|x86
+		{566F1803-90B5-4947-8730-57F092FBB002}.Debug|x86.Build.0 = Debug|x86
+		{566F1803-90B5-4947-8730-57F092FBB002}.Release|x86.ActiveCfg = Release|x86
+		{566F1803-90B5-4947-8730-57F092FBB002}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

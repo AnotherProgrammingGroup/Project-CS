@@ -9,6 +9,9 @@ using FarseerPhysics.Common.Decomposition;
 
 namespace Util
 {
+    /// <summary>
+    /// A class for utility methods regarding the working together of the TmxMap and World classes.
+    /// </summary>
     class MapWorldUtil
     {
         public struct TmxObjectBody

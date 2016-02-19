@@ -39,7 +39,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimatedSprite.cs" />
-    <Compile Include="Game.cs" />
+    <Compile Include="SpaceZeldaGame.cs" />
+    <Compile Include="Hacksoi - Currently Editing\HacksoiGame.cs" />
     <Compile Include="Launcher.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,11 +69,21 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\HacksoiContent\test.tmx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Content\test.tmx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Farseer Physics DebugView 3.5\DebugView MonoGame.csproj">
+      <Project>{566f1803-90b5-4947-8730-57f092fbb002}</Project>
+      <Name>DebugView MonoGame</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

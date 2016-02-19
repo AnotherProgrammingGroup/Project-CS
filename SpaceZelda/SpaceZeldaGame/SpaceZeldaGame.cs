@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace SpaceZeldaGame
 {
-    public class Game : Microsoft.Xna.Framework.Game
+    public class SpaceZeldaGame : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -24,7 +24,7 @@ namespace SpaceZeldaGame
 
         Player player;
 
-        public Game()
+        public SpaceZeldaGame()
             : base()
         {
             graphics = new GraphicsDeviceManager(this);

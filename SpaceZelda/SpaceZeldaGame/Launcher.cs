@@ -1,4 +1,6 @@
 ﻿using System;
+using Hacksoi;
+using Microsoft.Xna.Framework;
 
 namespace SpaceZeldaGame
 {
@@ -7,8 +9,10 @@ namespace SpaceZeldaGame
         [STAThread]
         static void Main()
         {
-            using (var game = new Game())
-                game.Run();
+            Game game;
+            //game = new SpaceZeldaGame();
+            game = new HacksoiGame();
+            game.Run();
         }
     }
 }

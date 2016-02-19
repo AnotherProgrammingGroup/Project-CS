@@ -60,7 +60,7 @@ namespace Util
                     {
                         string value;
                         obj.Properties.TryGetValue(property, out value);
-                        // allow null elements to set default value
+                        // allow null elements to act as a flag to default values
                         SetProperty(property, value, body);
                     }
 

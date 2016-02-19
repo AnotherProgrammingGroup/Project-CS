@@ -2,60 +2,83 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SpaceZeldaGame
 {
-    public class AnimatedSprite
+    abstract class AnimatedSprite
     {
-        public Texture2D Texture { get; set; }
-        public int Rows { get; set; }
-        public int Columns { get; set; }
-        public int Height { get; set; }
-        public int Width { get; set; }
-        public int MillisecondsPerFrame { get; set; }
+        public enum myDirection { none, left, right, up, down };
+        protected myDirection currentDir = myDirection.none;
+        protected Texture2D sTexture;
+        protected Vector2 sPostion;
+        private int frameIndex;
+        private double timeElapsed;
+        private double timeToUpdate;
+        protected string currentAnimation;
+        protected Vector2 sDirection = Vector2.Zero;
 
-        private int currentFrame;
-        private int totalFrames;
-        private int timeSinceLastFrame = 0;
-
-
-        public AnimatedSprite(Texture2D texture, int rows, int columns, int milliseconds)
+        public int FramesPerSecond
         {
-            Texture = texture;
-            Rows = rows;
-            Columns = columns;
-            Height = texture.Height / rows;
-            Width = texture.Width / columns;
-            MillisecondsPerFrame = milliseconds;
-            currentFrame = 0;
-            totalFrames = Rows * Columns;
+            set { timeToUpdate = (1f / value); }
         }
 
-        public void Update(GameTime gameTime)
+        private Dictionary<string, Rectangle[]> sAnimations = new Dictionary<string, Rectangle[]>();
+        private Dictionary<string, Vector2> sOffsets = new Dictionary<string, Vector2>();
+
+        public AnimatedSprite(Vector2 position)
         {
-            timeSinceLastFrame += gameTime.ElapsedGameTime.Milliseconds;
-            if (timeSinceLastFrame > MillisecondsPerFrame)
+            sPostion = position;
+        }
+
+        public void AddAnimation(int frames, int yPos, int xStartFrame, string name, int width, int height, Vector2 offset)
+        {
+
+            Rectangle[] Rectangles = new Rectangle[frames];
+
+            for (int i = 0; i < frames; i++)
             {
-                ++currentFrame;
-                if (currentFrame == totalFrames)
+                Rectangles[i] = new Rectangle((i + xStartFrame) * width, yPos, width, height);
+            }
+            sAnimations.Add(name, Rectangles);
+            sOffsets.Add(name, offset);
+        }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            timeElapsed += gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (timeElapsed > timeToUpdate)
+            {
+                timeElapsed -= timeToUpdate;
+
+                if (frameIndex < sAnimations[currentAnimation].Length - 1)
                 {
-                    currentFrame = 0;
+                    frameIndex++;
                 }
-                timeSinceLastFrame = 0;
+                else
+                {
+                    AnimationDone(currentAnimation);
+                    frameIndex = 0;
+                }
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 location)
+        public void Draw(SpriteBatch spriteBatch)
         {
-            int row = currentFrame / Columns;
-            int column = currentFrame % Columns;
-
-            Rectangle sourceRectangle = new Rectangle(Width * column + 1, Height * row + 1, Width - 1, Height - 1);
-            Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, Width, Height);
-
-            spriteBatch.Draw(Texture, destinationRectangle, sourceRectangle, Color.White);
+            spriteBatch.Draw(sTexture, sPostion + sOffsets[currentAnimation], sAnimations[currentAnimation][frameIndex], Color.White);
         }
+
+        public void PlayAnimation(string name)
+        {
+            if (currentAnimation != name && currentDir == myDirection.none)
+            {
+                currentAnimation = name;
+                frameIndex = 0;
+            }
+        }
+
+        public abstract void AnimationDone(string animation);
     }
 }

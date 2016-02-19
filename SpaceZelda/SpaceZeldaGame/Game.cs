@@ -22,15 +22,10 @@ namespace SpaceZeldaGame
 
         TiledMap tiledMap;
 
-        Body playerBody;
-        AnimatedSprite playerSprite;
-        Vector2 playerOrigin;
-
-        Body groundBody;
-        Texture2D groundSprite;
-        Vector2 groundOrigin;
+        Player player;
 
         public Game()
+            : base()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1080;
@@ -57,24 +52,8 @@ namespace SpaceZeldaGame
 
             tiledMap = new TiledMap(Content, "Content/test.tmx");
 
-            Texture2D playerSpriteTexture = Content.Load<Texture2D>("Sprite1");
-            playerSprite = new AnimatedSprite(playerSpriteTexture, 4, 4, 100);
-            playerOrigin = new Vector2(playerSprite.Width / 2f, playerSprite.Height / 2f);
-            Vector2 playerStartPosition = ConvertUnits.ToSimUnits(screenCenter) + new Vector2(0, -2f);
-            playerBody = BodyFactory.CreateRectangle(world, 
-                ConvertUnits.ToSimUnits(playerSprite.Width), ConvertUnits.ToSimUnits(playerSprite.Height), 1f, playerStartPosition);
-            playerBody.BodyType = BodyType.Dynamic;
-            playerBody.Restitution = 0.3f;
-            playerBody.Friction = 0.5f;
-
-            groundSprite = Content.Load<Texture2D>("GroundSprite");
-            groundOrigin = new Vector2(groundSprite.Width / 2f, groundSprite.Height / 2f);
-            Vector2 groundStartPosition = ConvertUnits.ToSimUnits(screenCenter) + new Vector2(0, 4f);
-            groundBody = BodyFactory.CreateRectangle(world, 
-                ConvertUnits.ToSimUnits(groundSprite.Width), ConvertUnits.ToSimUnits(groundSprite.Height), 1f, groundStartPosition);
-            groundBody.IsStatic = true;
-            groundBody.Restitution = 0.3f;
-            groundBody.Friction = 0.5f;
+            player = new Player(new Vector2(100, 100));
+            player.LoadContent(Content);
         }
 
         protected override void UnloadContent()
@@ -90,8 +69,8 @@ namespace SpaceZeldaGame
             view = Matrix.CreateTranslation(
                 new Vector3(camera - screenCenter, 0f)) * Matrix.CreateTranslation(new Vector3(screenCenter, 0f));
 
-            playerSprite.Update(gameTime);
 
+            player.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -121,19 +100,6 @@ namespace SpaceZeldaGame
                 camera.Y -= 1.5f;
             }
 
-            if (state.IsKeyDown(Keys.A))
-            {
-                playerBody.ApplyLinearImpulse(new Vector2(-1, 0));
-            }
-            if (state.IsKeyDown(Keys.D))
-            {
-                playerBody.ApplyLinearImpulse(new Vector2(1, 0));
-            }
-            if (state.IsKeyDown(Keys.W) && oldKeyState.IsKeyUp(Keys.W))
-            {
-                playerBody.ApplyLinearImpulse(new Vector2(0, -40));
-            }
-
             oldKeyState = state;
         }
 
@@ -143,8 +109,7 @@ namespace SpaceZeldaGame
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, view);
             tiledMap.Draw(spriteBatch);
-            playerSprite.Draw(spriteBatch, ConvertUnits.ToDisplayUnits(playerBody.Position) - playerOrigin);
-            spriteBatch.Draw(groundSprite, ConvertUnits.ToDisplayUnits(groundBody.Position), null, Color.White, 0f, groundOrigin, 1f, SpriteEffects.None, 0f);
+            player.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

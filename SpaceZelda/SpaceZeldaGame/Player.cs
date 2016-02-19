@@ -11,7 +11,7 @@ namespace SpaceZeldaGame
 {
     class Player : AnimatedSprite
     {
-        float mySpeed = 100;
+        float mySpeed = 90;
 
         public Player(Vector2 position) : base(position)
         {

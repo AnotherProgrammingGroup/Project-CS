@@ -83,11 +83,11 @@ namespace SpaceZeldaGame
                 Exit();
             }
 
-            if (state.IsKeyDown(Keys.Left))
+            if (state.IsKeyDown(Keys.A))
             {
                 camera.X += 1.5f;
             }
-            if (state.IsKeyDown(Keys.Right))
+            if (state.IsKeyDown(Keys.D))
             {
                 camera.X -= 1.5f;
             }

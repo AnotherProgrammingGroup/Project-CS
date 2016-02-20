@@ -14,13 +14,13 @@ namespace Util
     /// </summary>
     class TmxObjectLayerUtil
     {
-        public struct TmxObjectBody
+        public struct TmxObjectAndBody
         {
             public Body Body { get; set; }
 
             public TmxObject TmxObject { get; set; }
 
-            public TmxObjectBody(Body body, TmxObject obj)
+            public TmxObjectAndBody(Body body, TmxObject obj)
             {
                 Body = body;
                 TmxObject = obj;
@@ -40,9 +40,9 @@ namespace Util
         /// <param name="map"></param>
         /// <param name="world"></param>
         /// <returns> </returns> 
-        public static List<TmxObjectBody> InsertObjects(TmxMap map, World world)
+        public static List<TmxObjectAndBody> InsertObjects(TmxMap map, World world)
         {
-            List<TmxObjectBody> tmxObjectBodys = new List<TmxObjectBody>();
+            List<TmxObjectAndBody> tmxObjectBodys = new List<TmxObjectAndBody>();
 
             foreach (var objLayer in map.ObjectGroups)
             {
@@ -64,7 +64,7 @@ namespace Util
                         SetProperty(property, value, body);
                     }
 
-                    tmxObjectBodys.Add(new TmxObjectBody(body, obj));
+                    tmxObjectBodys.Add(new TmxObjectAndBody(body, obj));
                 }
             }
 

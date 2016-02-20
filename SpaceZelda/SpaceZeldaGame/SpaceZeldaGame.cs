@@ -43,7 +43,7 @@ namespace SpaceZeldaGame
 
             Content.RootDirectory = "Content";
 
-            world = new World(new Vector2(0, 9.82f)); // this is a test comment
+            world = new World(new Vector2(0, 9.82f));
         }
 
         protected override void Initialize()

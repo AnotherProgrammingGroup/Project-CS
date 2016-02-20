@@ -10,8 +10,8 @@ namespace SpaceZeldaGame
         static void Main()
         {
             Game game;
-            game = new SpaceZeldaGame();
-            //game = new HacksoiGame();
+            //game = new SpaceZeldaGame();
+            game = new HacksoiGame();
             game.Run();
         }
     }

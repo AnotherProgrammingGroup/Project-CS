@@ -10,7 +10,6 @@ using SpaceZeldaGame;
 using FarseerPhysics.Collision.Shapes;
 using System;
 using FarseerPhysics.Common;
-using FarseerPhysics.Factories;
 using FarseerPhysics.Dynamics.Contacts;
 
 // TODO: Add zoom feature (basicEffect.View * scale)
@@ -54,6 +53,7 @@ namespace Hacksoi
             graphics.PreferredBackBufferWidth = map.Map.Width * map.Map.TileWidth;
             graphics.PreferredBackBufferHeight = map.Map.Height * map.Map.TileHeight;
             graphics.ApplyChanges();
+            centerWindow();
             
             cameraPosition = Vector2.Zero;
             screenCenter = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f);
@@ -61,7 +61,6 @@ namespace Hacksoi
 
             basicEffect = new BasicEffect(graphics.GraphicsDevice);
             basicEffect.Projection = Matrix.CreateOrthographic(graphics.GraphicsDevice.Viewport.Width, -graphics.GraphicsDevice.Viewport.Height, 0.1f, 1000f);
-            //basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, 0, 0.1f, 1000f);
             basicEffect.View = Matrix.Identity;
             basicEffect.World = Matrix.Identity;
             basicEffect.TextureEnabled = true;
@@ -72,6 +71,12 @@ namespace Hacksoi
             font = Content.Load<SpriteFont>("Font");
 
             LoadWorld();
+        }
+
+        private void centerWindow()
+        {
+            Window.Position = new Point(GraphicsDevice.DisplayMode.Width / 2 - Window.ClientBounds.Width / 2, 
+                GraphicsDevice.DisplayMode.Height / 2 - Window.ClientBounds.Height / 2);
         }
 
         private void LoadWorld()
@@ -89,67 +94,94 @@ namespace Hacksoi
                 TmxObjectLayerUtil.TmxObjectAndBody tmxObjAndBody = tmxObjectAndBodies[i];
                 if(tmxObjAndBody.TmxObject.Name.Equals("Player"))
                 {
-                    adjustBody(ref tmxObjAndBody);
                     playerBody = tmxObjAndBody.Body;
+
+                    changeShapeToCapsule(playerBody);
+
+                    // These must be set after the shape change.
+                    playerBody.BodyType = BodyType.Dynamic;
+                    playerBody.FixedRotation = true;
+                    playerBody.Friction = 0;
+
+                    Fixture foot = attachFoot(playerBody);
+                    foot.OnCollision += FootCollision;
+                    foot.OnSeparation += EndFootCollision;
+
                     break;
                 }
             }
             
         }
 
-        /// <summary>
-        /// Adjusts the body to a shape that supports platforming physics.
-        /// </summary>
-        /// <param name="tmxObjAndBody"></param> The body's shape must be a polygon.
-        private void adjustBody(ref TmxObjectLayerUtil.TmxObjectAndBody tmxObjAndBody)
+        private static void changeShapeToCapsule(Body body)
         {
-            Body body = tmxObjAndBody.Body;
-            body.BodyType = BodyType.Dynamic;
-            body.FixedRotation = true;
+            Vector2 size = getSizeOf((PolygonShape)body.FixtureList[0].Shape);
 
-            float width = ConvertUnits.ToSimUnits(tmxObjAndBody.TmxObject.Width);
-            float height = ConvertUnits.ToSimUnits(tmxObjAndBody.TmxObject.Height);
-            CircleShape circle = new CircleShape(width / 2, 1f);
-            // position is relative to the Body's position
-            circle.Position = new Vector2(0, height / 2);
-
-            // with the addition of the circle, we the player's overall shape is now too tall
-            // by an amount of the circle's radius. So, we have to replace the original rectangular
-            // shape with a new, smaller one.
-            Fixture originalFixture = body.FixtureList[0];
-            Vertices vertices = ((PolygonShape)(originalFixture.Shape)).Vertices;
-            Vertices newVertices = new Vertices();
-            foreach (var vec in vertices)
+            Vertices shapeVertices = ((PolygonShape)body.FixtureList[0].Shape).Vertices;
+            // Since we are adding new circles and thus making the shape too large, 
+            // we have to create a new shape that, with the added circles, matches the
+            // original size.
+            Vertices newShapeVertices = new Vertices();
+            foreach (var vert in shapeVertices)
             {
-                Vector2 newVec = vec;
-                if (newVec.Y < 0)
-                {
-                    newVec.Y += circle.Radius;
-                }
-                newVertices.Add(newVec);
+                Vector2 newVert = new Vector2(vert.X, vert.Y * 0.5f);
+                newShapeVertices.Add(newVert);
             }
-            PolygonShape newShape = new PolygonShape(newVertices, 1f);
+            PolygonShape newShape = new PolygonShape(newShapeVertices, 1f);
+            body.CreateFixture(newShape);
+
+            CircleShape top = new CircleShape(size.X / 2f, 0f);
+            top.Position = new Vector2(0, -size.Y / 4f);
+            body.CreateFixture(top);
+
+            CircleShape bottom = new CircleShape(size.X / 2f, 0f);
+            bottom.Position = new Vector2(0, size.Y / 4f);
+            body.CreateFixture(bottom);
+
+            // Remove the original shape.
+            body.DestroyFixture(body.FixtureList[0]);
+        }
+
+        private static Fixture attachFoot(Body body)
+        {
+            CircleShape bottomCircle = (CircleShape)body.FixtureList[2].Shape;
+            float xOffset = bottomCircle.Radius / 2f, yOrigin = bottomCircle.Position.Y + bottomCircle.Radius, yOffset = bottomCircle.Radius / 4f;
 
             Vertices footVertices = new Vertices();
-            footVertices.Add(new Vector2(-width / 4, circle.Position.Y + circle.Radius + circle.Radius / 4f));
-            footVertices.Add(new Vector2(width / 4, circle.Position.Y + circle.Radius + circle.Radius / 4f));
-            footVertices.Add(new Vector2(width / 4, circle.Position.Y + circle.Radius - circle.Radius / 4f));
-            footVertices.Add(new Vector2(-width / 4, circle.Position.Y + circle.Radius - circle.Radius / 4f));
+            footVertices.Add(new Vector2(-xOffset, yOrigin + yOffset));
+            footVertices.Add(new Vector2(xOffset, yOrigin + yOffset));
+            footVertices.Add(new Vector2(xOffset, yOrigin - yOffset));
+            footVertices.Add(new Vector2(-xOffset, yOrigin - yOffset));
             PolygonShape foot = new PolygonShape(footVertices, 1f);
 
-            body.DestroyFixture(originalFixture);
-            body.CreateFixture(newShape);
-            body.CreateFixture(circle);
-            Fixture footFixture = body.CreateFixture(foot, "foot");
+            Fixture footFixture = body.CreateFixture(foot);
             footFixture.IsSensor = true;
-            footFixture.OnCollision += FootCollision;
-            footFixture.OnSeparation += EndFootCollision;
+
+            return footFixture;
+        }
+
+        private static Vector2 getSizeOf(PolygonShape shape)
+        {
+            Vector2 v0 = shape.Vertices[0];
+            Vector2 v = new Vector2(Math.Abs(v0.X * 2), Math.Abs(v0.Y * 2));
+            return v;
+        }
+
+        public bool FootCollision(Fixture f1, Fixture f2, Contact contact)
+        {
+            isGrounded = true;
+            return true;
+        }
+
+        public void EndFootCollision(Fixture f1, Fixture f2)
+        {
+            isGrounded = false;
         }
 
         protected override void Update(GameTime gameTime)
         {
             HandleKeyboard();
-            
+
             world.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f);
 
             base.Update(gameTime);
@@ -186,29 +218,19 @@ namespace Hacksoi
         {
             Vector2 vel = playerBody.GetLinearVelocityFromLocalPoint(Vector2.Zero);
             float desiredVel = 0;
-            
+
+            float maxVel = 2.5f;
             if(state.IsKeyDown(Keys.D))
-                desiredVel += 5;
+                desiredVel += maxVel;
             if (state.IsKeyDown(Keys.A))
-                desiredVel -= 5;
+                desiredVel -= maxVel;
 
             float velChange = desiredVel - vel.X;
             float impulse = playerBody.Mass * velChange;
             playerBody.ApplyLinearImpulse(new Vector2(impulse, 0));
 
             if (isGrounded && state.IsKeyDown(Keys.Space) && oldKeyState.IsKeyUp(Keys.Space))
-                playerBody.ApplyLinearImpulse(new Vector2(0, -2.5f));
-        }
-
-        public bool FootCollision(Fixture f1, Fixture f2, Contact contact)
-        {
-            isGrounded = true;
-            return true;
-        }
-
-        public void EndFootCollision(Fixture f1, Fixture f2)
-        {
-            isGrounded = false;
+                playerBody.ApplyLinearImpulse(new Vector2(0, -1.75f));
         }
 
         protected override void Draw(GameTime gameTime)
@@ -224,9 +246,9 @@ namespace Hacksoi
             Matrix _debugView = Matrix.CreateTranslation(ConvertUnits.ToSimUnits(new Vector3(cameraPosition - screenCenter, -1f)));
             debugView.RenderDebugData(debugProjection, _debugView);
 
-            //debugView.BeginCustomDraw(debugProjection, _debugView);
-            //debugView.DrawPoint(playerBody.Position, 0.05f, Color.Blue);
-            //debugView.EndCustomDraw();
+            debugView.BeginCustomDraw(debugProjection, _debugView);
+            debugView.DrawPoint(playerBody.Position, 0.05f, Color.Blue);
+            debugView.EndCustomDraw();
 
             base.Draw(gameTime);
         }

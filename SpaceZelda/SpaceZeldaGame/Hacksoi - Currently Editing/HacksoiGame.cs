@@ -8,60 +8,65 @@ using System.Collections.Generic;
 using Util;
 using SpaceZeldaGame;
 
-// TODO: Add zoom feature (_view * _scale)
+// TODO: Add zoom feature (view * scale)
 
 namespace Hacksoi
 {
-    public class HacksoiGame : Microsoft.Xna.Framework.Game
+    public class HacksoiGame : Game
     {
-        private GraphicsDeviceManager _graphics;
-        private SpriteBatch _batch;
-        private KeyboardState _oldKeyState;
-        private SpriteFont _font;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch batch;
+        private KeyboardState oldKeyState;
+        private SpriteFont font;
 
-        private Matrix _projection;
-        private Matrix _view;
-        private Vector2 _cameraPosition;
-        private Vector2 _screenCenter;
+        private Matrix projection;
+        private Matrix view;
+        private Vector2 cameraPosition;
+        private Vector2 screenCenter;
 
-        private World _world;
+        private BasicEffect basicEffect;
+        private RasterizerState rasterizerState;
 
-        private Body _playerBody;
+        private World world;
 
-        private DebugViewXNA _debugView;
+        private Body playerBody;
 
-        private BasicEffect _basicEffect;
+        private DebugViewXNA debugView;
 
-        private TiledMap _map;
+        private TiledMap map;
 
         public HacksoiGame()
         {
-            _graphics = new GraphicsDeviceManager(this);
+            graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
         }
 
         protected override void LoadContent()
         {
-            _map = new TiledMap(Content, "Content/HacksoiContent/test.tmx", "HacksoiContent/");
+            map = new TiledMap(Content, "Content/HacksoiContent/test.tmx", "HacksoiContent/");
 
-            _graphics.PreferredBackBufferWidth = _map.Map.Width * _map.Map.TileWidth;
-            _graphics.PreferredBackBufferHeight = _map.Map.Height * _map.Map.TileHeight;
-            _graphics.ApplyChanges();
-            
-            _projection = Matrix.CreateOrthographicOffCenter(0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight, 0, 0.1f, 1000f);
-            _view = Matrix.Identity;
-            _cameraPosition = Vector2.Zero;
-            _screenCenter = new Vector2(_graphics.GraphicsDevice.Viewport.Width / 2f, _graphics.GraphicsDevice.Viewport.Height / 2f);
-            _batch = new SpriteBatch(_graphics.GraphicsDevice);
+            graphics.PreferredBackBufferWidth = map.Map.Width * map.Map.TileWidth;
+            graphics.PreferredBackBufferHeight = map.Map.Height * map.Map.TileHeight;
+            graphics.ApplyChanges();
 
-            _basicEffect = new BasicEffect(_graphics.GraphicsDevice);
-            _basicEffect.Projection = _projection;
-            _basicEffect.View = _view;
-            _basicEffect.World = Matrix.Identity;
-            _basicEffect.TextureEnabled = true;
+            projection = Matrix.CreateOrthographic(graphics.GraphicsDevice.Viewport.Width, -graphics.GraphicsDevice.Viewport.Height, 0.1f, 1000f);
+            //projection = Matrix.CreateOrthographicOffCenter(0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, 0, 0.1f, 1000f);
+            view = Matrix.Identity;
+            cameraPosition = Vector2.Zero;
+            screenCenter = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2f, graphics.GraphicsDevice.Viewport.Height / 2f);
+            batch = new SpriteBatch(graphics.GraphicsDevice);
 
-            _font = Content.Load<SpriteFont>("Font");
+            basicEffect = new BasicEffect(graphics.GraphicsDevice);
+            basicEffect.Projection = projection;
+            basicEffect.View = view;
+            basicEffect.World = Matrix.Identity;
+            basicEffect.TextureEnabled = true;
+
+            rasterizerState = new RasterizerState();
+            rasterizerState.CullMode = CullMode.None;
+
+            font = Content.Load<SpriteFont>("Font");
 
             LoadWorld();
         }
@@ -70,16 +75,16 @@ namespace Hacksoi
         {
             ConvertUnits.SetDisplayUnitToSimUnitRatio(64f);
 
-            _world = new World(new Vector2(0, 9.81f));
-            _debugView = new DebugViewXNA(_world);
-            _debugView.LoadContent(_graphics.GraphicsDevice, Content);
+            world = new World(new Vector2(0, 9.81f));
+            debugView = new DebugViewXNA(world);
+            debugView.LoadContent(graphics.GraphicsDevice, Content);
 
-            List<MapWorldUtil.TmxObjectBody> objectBodies = MapWorldUtil.InsertObjects(_map.Map, _world);
+            List<TmxObjectLayerUtil.TmxObjectBody> objectBodies = TmxObjectLayerUtil.InsertObjects(map.Map, world);
             foreach (var objBod in objectBodies)
             {
                 if(objBod.TmxObject.Name.Equals("Player"))
                 {
-                    _playerBody = objBod.Body;
+                    playerBody = objBod.Body;
                     break;
                 }
             }
@@ -89,7 +94,7 @@ namespace Hacksoi
         {
             HandleKeyboard();
             
-            _world.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f);
+            world.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f);
 
             base.Update(gameTime);
         }
@@ -100,49 +105,49 @@ namespace Hacksoi
             
             float cameraSpeed = 3.5f;
             if (state.IsKeyDown(Keys.Left))
-                _cameraPosition.X += cameraSpeed;
+                cameraPosition.X += cameraSpeed;
 
             if (state.IsKeyDown(Keys.Right))
-                _cameraPosition.X -= cameraSpeed;
+                cameraPosition.X -= cameraSpeed;
 
             if (state.IsKeyDown(Keys.Up))
-                _cameraPosition.Y += cameraSpeed;
+                cameraPosition.Y += cameraSpeed;
 
             if (state.IsKeyDown(Keys.Down))
-                _cameraPosition.Y -= cameraSpeed;
-
-            _view = Matrix.CreateTranslation(new Vector3(_cameraPosition, -1f));
+                cameraPosition.Y -= cameraSpeed;
+            
+            view = Matrix.CreateTranslation(new Vector3(cameraPosition - screenCenter, -1f));
 
             float torqueAmt = 2;
             if (state.IsKeyDown(Keys.A))
-                _playerBody.ApplyTorque(-torqueAmt);
+                playerBody.ApplyTorque(-torqueAmt);
 
             if (state.IsKeyDown(Keys.D))
-                _playerBody.ApplyTorque(torqueAmt);
+                playerBody.ApplyTorque(torqueAmt);
 
-            if (state.IsKeyDown(Keys.Space) && _oldKeyState.IsKeyUp(Keys.Space))
-                _playerBody.ApplyLinearImpulse(new Vector2(0, -2.5f));
+            if (state.IsKeyDown(Keys.Space) && oldKeyState.IsKeyUp(Keys.Space))
+                playerBody.ApplyLinearImpulse(new Vector2(0, -2.5f));
 
             if (state.IsKeyDown(Keys.Escape))
                 Exit();
 
-            _oldKeyState = state;
+            oldKeyState = state;
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _basicEffect.View = _view;
+            basicEffect.View = view;
 
-            _batch.Begin(SpriteSortMode.Deferred, null, null, null, null, _basicEffect, null);
-            _map.Draw(_batch);
-            _batch.End();
+            batch.Begin(SpriteSortMode.Deferred, null, null, null, rasterizerState, basicEffect, null);
+            map.Draw(batch);
+            batch.End();
 
-            Matrix debugProjection = Matrix.CreateOrthographicOffCenter(0, ConvertUnits.ToSimUnits(_graphics.PreferredBackBufferWidth), 
-                ConvertUnits.ToSimUnits(_graphics.PreferredBackBufferHeight), 0, ConvertUnits.ToSimUnits(0.1f), ConvertUnits.ToSimUnits(1000f));
-            Matrix debugView = Matrix.CreateTranslation(ConvertUnits.ToSimUnits(new Vector3(_cameraPosition, -1f)));
-            _debugView.RenderDebugData(debugProjection, debugView);
+            Matrix debugProjection = Matrix.CreateOrthographic(ConvertUnits.ToSimUnits(graphics.GraphicsDevice.Viewport.Width), 
+                ConvertUnits.ToSimUnits(-graphics.GraphicsDevice.Viewport.Height), ConvertUnits.ToSimUnits(0.1f), ConvertUnits.ToSimUnits(1000f));
+            Matrix _debugView = Matrix.CreateTranslation(ConvertUnits.ToSimUnits(new Vector3(cameraPosition - screenCenter, -1f)));
+            debugView.RenderDebugData(debugProjection, _debugView);
 
             base.Draw(gameTime);
         }

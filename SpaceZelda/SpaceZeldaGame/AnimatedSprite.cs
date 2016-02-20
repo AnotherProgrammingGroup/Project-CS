@@ -12,7 +12,7 @@ namespace SpaceZeldaGame
         public enum myDirection { none, left, right, up, down };
         protected myDirection currentDir = myDirection.none;
         protected Texture2D sTexture;
-        protected Vector2 sPostion;
+        public Vector2 sPostion;
         private int frameIndex;
         private double timeElapsed;
         private double timeToUpdate;
@@ -34,7 +34,6 @@ namespace SpaceZeldaGame
 
         public void AddAnimation(int frames, int yPos, int xStartFrame, string name, int width, int height, Vector2 offset)
         {
-
             Rectangle[] Rectangles = new Rectangle[frames];
 
             for (int i = 0; i < frames; i++)

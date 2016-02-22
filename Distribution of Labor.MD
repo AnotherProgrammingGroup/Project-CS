@@ -7,6 +7,7 @@
 4. Complete the current lesson (read the readme for instructions)
 
 ##Frankito
+Is also not dead. I was just tired. Will be back Monday as well.
 
 ##jugg
 

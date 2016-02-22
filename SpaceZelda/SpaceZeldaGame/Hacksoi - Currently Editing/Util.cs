@@ -9,66 +9,54 @@ using FarseerPhysics.Common.Decomposition;
 
 namespace Util
 {
-    /// <summary>
-    /// A class for utility methods regarding the working together of the TmxMap and World classes.
-    /// </summary>
-    class TmxObjectLayerUtil
+    public class UserData
     {
-        public struct TmxObjectAndBody
+        private Dictionary<string, object> dataDictionary;
+
+        public UserData()
         {
-            public Body Body { get; set; }
-
-            public TmxObject TmxObject { get; set; }
-
-            public TmxObjectAndBody(Body body, TmxObject obj)
-            {
-                Body = body;
-                TmxObject = obj;
-            }
+            dataDictionary = new Dictionary<string, object>();
         }
 
+        public void Add(string key, object data)
+        {
+            dataDictionary.Add(key, data);
+        }
+
+        public T Get<T>(string key)
+        {
+            object data;
+            dataDictionary.TryGetValue(key, out data);
+            return (T)data;
+        }
+    }
+    
+    public class MapWorldUtil
+    {
         private static string[] DefaultBodyProperties = new string[]
         {
                 "BodyType", "Density", "FixedRotation", "Friction", "Mass", "Restitution",  "Rotation"
         };
 
-        /// <summary>
-        /// Inserts all objects from <paramref name="map"/> into <paramref name="world"/> 
-        /// and returns a list of TmxObjectBodys (a struct which contains a reference to 
-        /// the Body created and the corresponding TmxObject.)
-        /// </summary>
-        /// <param name="map"></param>
-        /// <param name="world"></param>
-        /// <returns> </returns> 
-        public static List<TmxObjectAndBody> InsertObjects(TmxMap map, World world)
+        public static Body InsertBody(TmxObject obj, World world)
         {
-            List<TmxObjectAndBody> tmxObjectBodys = new List<TmxObjectAndBody>();
+            float density = 1f;
+            string densityStr;
+            obj.Properties.TryGetValue("Density", out densityStr);
+            if (densityStr != null)
+                density = float.Parse(densityStr);
 
-            foreach (var objLayer in map.ObjectGroups)
+            Body body = CreateBody(obj, density, world);
+
+            foreach (var property in DefaultBodyProperties)
             {
-                foreach (var obj in objLayer.Objects)
-                {
-                    float density = 1f;
-                    string densityStr;
-                    obj.Properties.TryGetValue("Density", out densityStr);
-                    if (densityStr != null)
-                        density = float.Parse(densityStr);
-
-                    Body body = CreateBody(obj, density, world);
-
-                    foreach (var property in DefaultBodyProperties)
-                    {
-                        string value;
-                        obj.Properties.TryGetValue(property, out value);
-                        // allow null elements to act as a flag to default values
-                        SetProperty(property, value, body);
-                    }
-
-                    tmxObjectBodys.Add(new TmxObjectAndBody(body, obj));
-                }
+                string value;
+                obj.Properties.TryGetValue(property, out value);
+                // allow null elements to act as a flag to set default values
+                SetProperty(property, value, body);
             }
 
-            return tmxObjectBodys;
+            return body;
         }
 
         private static Body CreateBody(TmxObject obj, float density, World world)

@@ -1,0 +1,39 @@
+<Project>
+  <Name>Space Zelda</Name>
+  <ProjectItem type="NClass.DiagramEditor.ClassDiagram.Diagram" assembly="NClass.DiagramEditor, Version=2.4.1823.0, Culture=neutral, PublicKeyToken=null">
+    <Name>UserData System</Name>
+    <Language>CSharp</Language>
+    <Entities>
+      <Entity type="Class">
+        <Name>UserData</Name>
+        <Access>Public</Access>
+        <Location left="512" top="402" />
+        <Size width="235" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Field">private Dictionary&lt;string, Objectt&gt; data</Member>
+        <Member type="Method">public void Add(string key, Object data)</Member>
+        <Member type="Method">public T Get&lt;T&gt;(string key)</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+      <Entity type="Class">
+        <Name>Body</Name>
+        <Access>Public</Access>
+        <Location left="266" top="122" />
+        <Size width="162" height="216" />
+        <Collapsed>False</Collapsed>
+        <Member type="Property">public Object UserData { get; set; }</Member>
+        <Modifier>None</Modifier>
+      </Entity>
+    </Entities>
+    <Relationships>
+      <Relationship type="Association" first="1" second="0">
+        <Label>
+        </Label>
+        <StartOrientation>Horizontal</StartOrientation>
+        <EndOrientation>Horizontal</EndOrientation>
+        <Direction>Unidirectional</Direction>
+        <AssociationType>Composition</AssociationType>
+      </Relationship>
+    </Relationships>
+  </ProjectItem>
+</Project>

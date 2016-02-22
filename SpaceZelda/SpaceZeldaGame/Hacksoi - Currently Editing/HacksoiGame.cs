@@ -11,6 +11,7 @@ using FarseerPhysics.Collision.Shapes;
 using System;
 using FarseerPhysics.Common;
 using FarseerPhysics.Dynamics.Contacts;
+using TiledSharp;
 
 // TODO: Add zoom feature (basicEffect.View * scale)
 
@@ -88,64 +89,58 @@ namespace Hacksoi
             debugView = new DebugViewXNA(world);
             debugView.LoadContent(graphics.GraphicsDevice, Content);
 
-            List<TmxObjectLayerUtil.TmxObjectAndBody> tmxObjectAndBodies = TmxObjectLayerUtil.InsertObjects(map.Map, world);
-            for (int i = 0; i < tmxObjectAndBodies.Count; i++)
+            List<Body> bodies = new List<Body>();
+            foreach (var objLayer in map.Map.ObjectGroups)
             {
-                TmxObjectLayerUtil.TmxObjectAndBody tmxObjAndBody = tmxObjectAndBodies[i];
-                if(tmxObjAndBody.TmxObject.Name.Equals("Player"))
+                foreach (var obj in objLayer.Objects)
                 {
-                    playerBody = tmxObjAndBody.Body;
-
-                    changeShapeToCapsule(playerBody);
-
-                    // These must be set after the shape change.
-                    playerBody.BodyType = BodyType.Dynamic;
-                    playerBody.FixedRotation = true;
-                    playerBody.Friction = 0;
-
-                    Fixture foot = attachFoot(playerBody);
-                    foot.OnCollision += FootCollision;
-                    foot.OnSeparation += EndFootCollision;
-
-                    break;
+                    Body body = Util.InsertBody(obj, world);
+                    body.UserData = new UserData();
+                    bodies.Add(body);
                 }
             }
-            
+            IterateBodies(bodies);
         }
 
-        private static void changeShapeToCapsule(Body body)
+        private void IterateBodies(List<Body> bodies)
         {
-            Vector2 size = getSizeOf((PolygonShape)body.FixtureList[0].Shape);
-
-            Vertices shapeVertices = ((PolygonShape)body.FixtureList[0].Shape).Vertices;
-            // Since we are adding new circles and thus making the shape too large, 
-            // we have to create a new shape that, with the added circles, matches the
-            // original size.
-            Vertices newShapeVertices = new Vertices();
-            foreach (var vert in shapeVertices)
+            for (int i = 0; i < bodies.Count; i++)
             {
-                Vector2 newVert = new Vector2(vert.X, vert.Y * 0.5f);
-                newShapeVertices.Add(newVert);
+                Body body = bodies[i];
+                UserData userData = (UserData)body.UserData;
+                TmxObject tmxObj = userData.Get<TmxObject>("tmxObj");
+                if (tmxObj.Name.Equals("Player"))
+                {
+                    CreatePlayer(body);
+                }
             }
-            PolygonShape newShape = new PolygonShape(newShapeVertices, 1f);
-            body.CreateFixture(newShape);
-
-            CircleShape top = new CircleShape(size.X / 2f, 0f);
-            top.Position = new Vector2(0, -size.Y / 4f);
-            body.CreateFixture(top);
-
-            CircleShape bottom = new CircleShape(size.X / 2f, 0f);
-            bottom.Position = new Vector2(0, size.Y / 4f);
-            body.CreateFixture(bottom);
-
-            // Remove the original shape.
-            body.DestroyFixture(body.FixtureList[0]);
         }
 
-        private static Fixture attachFoot(Body body)
+        private void CreatePlayer(Body body)
         {
-            CircleShape bottomCircle = (CircleShape)body.FixtureList[2].Shape;
-            float xOffset = bottomCircle.Radius / 2f, yOrigin = bottomCircle.Position.Y + bottomCircle.Radius, yOffset = bottomCircle.Radius / 4f;
+            playerBody = body;
+            playerBody.BodyType = BodyType.Dynamic;
+            playerBody.FixedRotation = true;
+
+            FixShape(playerBody);
+
+            // This must be set after the shape change.
+            playerBody.Friction = 0;
+
+            Fixture foot = AttachFoot(playerBody);
+            foot.OnCollision += FootCollision;
+            foot.OnSeparation += EndFootCollision;
+        }
+
+        private static void FixShape(Body body)
+        {
+
+        }
+
+        private static Fixture AttachFoot(Body body)
+        {
+            Vector2 size = GetSizeOf(body);
+            float xOffset = size.X / 2.25f, yOrigin = size.Y / 2, yOffset = size.X / 6f;
 
             Vertices footVertices = new Vertices();
             footVertices.Add(new Vector2(-xOffset, yOrigin + yOffset));
@@ -160,11 +155,15 @@ namespace Hacksoi
             return footFixture;
         }
 
-        private static Vector2 getSizeOf(PolygonShape shape)
+        /// <summary>
+        /// Returns the size of the body USING the Body's TmxObject in its UserData.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        private static Vector2 GetSizeOf(Body body)
         {
-            Vector2 v0 = shape.Vertices[0];
-            Vector2 v = new Vector2(Math.Abs(v0.X * 2), Math.Abs(v0.Y * 2));
-            return v;
+            Util.BodyUserData userData = (Util.BodyUserData)body.UserData;
+            return ConvertUnits.ToSimUnits(new Vector2((float)userData.TmxObject.Width, (float)userData.TmxObject.Height));
         }
 
         public bool FootCollision(Fixture f1, Fixture f2, Contact contact)
@@ -219,7 +218,7 @@ namespace Hacksoi
             Vector2 vel = playerBody.GetLinearVelocityFromLocalPoint(Vector2.Zero);
             float desiredVel = 0;
 
-            float maxVel = 2.5f;
+            float maxVel = 3.5f;
             if(state.IsKeyDown(Keys.D))
                 desiredVel += maxVel;
             if (state.IsKeyDown(Keys.A))
@@ -230,7 +229,7 @@ namespace Hacksoi
             playerBody.ApplyLinearImpulse(new Vector2(impulse, 0));
 
             if (isGrounded && state.IsKeyDown(Keys.Space) && oldKeyState.IsKeyUp(Keys.Space))
-                playerBody.ApplyLinearImpulse(new Vector2(0, -1.75f));
+                playerBody.ApplyLinearImpulse(new Vector2(0, -3.75f));
         }
 
         protected override void Draw(GameTime gameTime)

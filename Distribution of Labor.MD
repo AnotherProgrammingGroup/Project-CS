@@ -11,5 +11,6 @@
 ##jugg
 
 ##CaveStory
+Is not dead. Will be back Monday!
 
 ##hacksoi

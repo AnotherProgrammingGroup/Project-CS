@@ -6,7 +6,7 @@ using FarseerPhysics;
 using FarseerPhysics.DebugView;
 using System.Collections.Generic;
 using Util;
-using SpaceZeldaGame;
+using SpaceZelda;
 using FarseerPhysics.Collision.Shapes;
 using System;
 using FarseerPhysics.Common;
@@ -94,7 +94,7 @@ namespace Hacksoi
             {
                 foreach (var obj in objLayer.Objects)
                 {
-                    Body body = Util.InsertBody(obj, world);
+                    Body body = U.InsertBody(obj, world);
                     body.UserData = new UserData();
                     bodies.Add(body);
                 }

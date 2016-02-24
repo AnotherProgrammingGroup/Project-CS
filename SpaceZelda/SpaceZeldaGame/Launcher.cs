@@ -1,8 +1,7 @@
 ﻿using System;
-using Hacksoi;
 using Microsoft.Xna.Framework;
 
-namespace SpaceZeldaGame
+namespace SpaceZelda
 {
     public static class Launcher
     {
@@ -10,8 +9,8 @@ namespace SpaceZeldaGame
         static void Main()
         {
             Game game;
-            //game = new SpaceZeldaGame();
-            game = new HacksoiGame();
+            game = new SpaceZeldaGame();
+            //game = new HacksoiGame();
             game.Run();
         }
     }

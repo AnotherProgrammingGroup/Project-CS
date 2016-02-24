@@ -1,45 +1,48 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Artemis.Attributes;
+using Artemis.Blackboard;
+using Artemis.Manager;
+using Artemis.System;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SpaceZelda.Components;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Artemis;
 using TiledSharp;
+using Microsoft.Xna.Framework;
 
-namespace SpaceZelda
+namespace SpaceZelda.Systems
 {
-    public class TiledMap
+    [ArtemisEntitySystem(ExecutionType = ExecutionType.Synchronous, GameLoopType = GameLoopType.Draw, Layer = 0)]
+    public class TiledMapRenderSystem : EntityComponentProcessingSystem<TiledMapComponent, TransformComponent>
     {
-        public TmxMap Map { get; }
+        private ContentManager contentManager;
+        private SpriteBatch spriteBatch;
 
-        private List<Texture2D> mapTextures;
-
-        public TiledMap(ContentManager Content, string mapLocation) : this(Content, mapLocation, "")
+        public override void LoadContent()
         {
+            this.contentManager = BlackBoard.GetEntry<ContentManager>("ContentManager");
+            this.spriteBatch = BlackBoard.GetEntry<SpriteBatch>("SpriteBatch");
         }
 
-        public TiledMap(ContentManager Content, string mapLocation, string tilesetLocation)
+        public override void Process(Entity entity, TiledMapComponent tiledMapComponent, TransformComponent transformComponent)
         {
-            Map = new TmxMap(mapLocation);
-            mapTextures = new List<Texture2D>();
-            foreach (var tileset in Map.Tilesets)
-            {
-                mapTextures.Add(Content.Load<Texture2D>(tilesetLocation + tileset.Name));
-            }
-        }
-
-        // TODO: Draw TmxTile objects
-        public void Draw(SpriteBatch spriteBatch)
-        {
-            foreach (var layer in Map.Layers)
+            TmxMap map = tiledMapComponent.Map;
+            List<Texture2D> textures = tiledMapComponent.Textures;
+            Vector2 transform = transformComponent.Position;
+            foreach (var layer in map.Layers)
             {
                 int tileIdx = 0;
                 foreach (var tile in layer.Tiles)
                 {
                     int tilesetIdx = 0;
-                    foreach (var tileset in Map.Tilesets)
+                    foreach (var tileset in map.Tilesets)
                     {
                         if (tileset.FirstGid <= tile.Gid && tile.Gid < tileset.FirstGid + tileset.TileCount)
                         {
-                            Texture2D texture = mapTextures[tilesetIdx];
+                            Texture2D texture = textures[tilesetIdx];
                             //tileWidth and tileHeight are in pixels
                             int tileWidth = tileset.TileWidth, tileHeight = tileset.TileHeight;
                             //tilesetWidth measure number of tiles across
@@ -53,12 +56,12 @@ namespace SpaceZelda
                                               tileHeight * row + row * tileset.Spacing,
                                               tileWidth, tileHeight);
 
-                            int x = (tileIdx % Map.Width) * Map.TileWidth;
-                            int y = (tileIdx / Map.Width) * Map.TileHeight + Map.TileHeight - 1;
+                            int x = (tileIdx % map.Width) * map.TileWidth;
+                            int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;
                             //At this point in time, (x, y) represents bottom left corner of Map tile
                             y -= tileHeight - 1;
                             Rectangle destinationRectangle =
-                                new Rectangle(x, y, tileWidth, tileHeight);
+                                new Rectangle((int) (x - transform.X), (int) (y - transform.Y), tileWidth, tileHeight);
 
                             //Now (x,y) represents top left corner of image tile
                             //Note that image tile represents the image being drawn,

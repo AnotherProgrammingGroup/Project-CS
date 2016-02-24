@@ -13,7 +13,7 @@
 ##CaveStory
 Back!
 
-##hacksoi
+##hacksoi (rip)
 MIA!?!?
 
 ##ecube

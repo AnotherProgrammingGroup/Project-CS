@@ -7,15 +7,8 @@
 4. Complete the current lesson (read the readme for instructions)
 
 ##Frankito
-I won't be on tonight (Wed, Feb 24)
-
-##jugg
 
 ##CaveStory
-Back!
-
-##hacksoi (rip)
-MIA!?!?
 
 ##ecube
 Getting comfortable with C#.

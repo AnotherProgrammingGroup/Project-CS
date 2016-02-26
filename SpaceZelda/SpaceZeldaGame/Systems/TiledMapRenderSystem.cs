@@ -5,17 +5,21 @@ using Artemis.System;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceZelda.Components;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Artemis;
 using TiledSharp;
 using Microsoft.Xna.Framework;
 
 namespace SpaceZelda.Systems
 {
-    [ArtemisEntitySystem(ExecutionType = ExecutionType.Synchronous, GameLoopType = GameLoopType.Draw, Layer = 0)]
+    // Renders the Tiled map
+    // Applies to entities with the following components:
+    //      * TiledMapComponent
+    //      * TransformComponent
+
+    [ArtemisEntitySystem(ExecutionType = ExecutionType.Synchronous,
+                         GameLoopType = GameLoopType.Draw,
+                         Layer = 0)]
     public class TiledMapRenderSystem : EntityComponentProcessingSystem<TiledMapComponent, TransformComponent>
     {
         private ContentManager contentManager;
@@ -27,7 +31,9 @@ namespace SpaceZelda.Systems
             this.spriteBatch = BlackBoard.GetEntry<SpriteBatch>("SpriteBatch");
         }
 
-        public override void Process(Entity entity, TiledMapComponent tiledMapComponent, TransformComponent transformComponent)
+        public override void Process(Entity entity, 
+                                     TiledMapComponent tiledMapComponent,
+                                     TransformComponent transformComponent)
         {
             TmxMap map = tiledMapComponent.Map;
             List<Texture2D> textures = tiledMapComponent.Textures;

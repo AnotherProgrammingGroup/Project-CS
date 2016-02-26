@@ -1,20 +1,23 @@
 ﻿using Artemis;
+using Artemis.Attributes;
 using Artemis.Manager;
 using Artemis.System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using SpaceZelda.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SpaceZeldaGame.Systems
+namespace SpaceZelda.Systems
 {
-    [Artemis.Attributes.ArtemisEntitySystem(ExecutionType = ExecutionType.Synchronous, GameLoopType = GameLoopType.Update, Layer = 1)]
-    public class CameraMovementSystem : EntityComponentProcessingSystem<TransformComponent>
+    // Handles camera movement by modifying TransformComponent of each entity
+    // Takes input from keyboard
+    // Applies to entities with the TransformComponent
+
+    [ArtemisEntitySystem(ExecutionType = ExecutionType.Synchronous,
+                         GameLoopType = GameLoopType.Update,
+                         Layer = 0)]
+    public class CameraControlSystem : EntityComponentProcessingSystem<TransformComponent>
     {
-        public override void Process(Entity e, TransformComponent transformComponent)
+        public override void Process(Entity entity, TransformComponent transformComponent)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 

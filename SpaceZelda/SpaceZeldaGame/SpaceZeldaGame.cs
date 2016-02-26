@@ -1,12 +1,9 @@
 ﻿using Artemis;
 using Artemis.System;
-using FarseerPhysics;
-using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpaceZelda.Components;
-using System;
 
 namespace SpaceZelda
 {

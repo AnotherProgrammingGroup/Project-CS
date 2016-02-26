@@ -2,14 +2,13 @@
 using Artemis.System;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using TiledSharp;
 
 namespace SpaceZelda.Components
 {
+    // Component which stores a TmxMap along with associated textures
+
     public class TiledMapComponent : IComponent
     {
         public TmxMap Map { get; set; }

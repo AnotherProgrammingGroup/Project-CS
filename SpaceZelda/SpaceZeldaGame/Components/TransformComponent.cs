@@ -1,12 +1,12 @@
 ﻿using Artemis.Interface;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SpaceZelda.Components
 {
+    // Determines how the in game physics world is displayed on the screen
+    // e.g. Translation means viewing only part of physics world
+    //      Scaling (not added) means zooming in.
+
     public class TransformComponent : IComponent
     {
         public Vector2 Position { get; set; }

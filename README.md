@@ -1,4 +1,4 @@
-##Hello and welcome to the very first R9KOSS project!
+##Hello and welcome to the very first APG project!
 The objective of this project is to learn c# and improve our coding abilities in a group environment through actual coding experience.
 
 In this project we will be creating a simple game from scratch, which we will then reflect upon to see what we have learned.

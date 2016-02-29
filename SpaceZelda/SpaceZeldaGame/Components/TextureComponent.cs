@@ -1,4 +1,7 @@
 ﻿using Artemis.Interface;
+using Artemis.System;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SpaceZelda.Components
 {
@@ -6,6 +9,15 @@ namespace SpaceZelda.Components
 
     class TextureComponent : IComponent
     {
-        //TODO
+        public string textureFile { get; set; }
+
+        public Texture2D texture { get; }
+
+        public TextureComponent(string file)
+        {
+            textureFile = file;
+            ContentManager Content = EntitySystem.BlackBoard.GetEntry<ContentManager>("ContentManager");
+            texture = Content.Load<Texture2D>(file);
+        }
     }
 }

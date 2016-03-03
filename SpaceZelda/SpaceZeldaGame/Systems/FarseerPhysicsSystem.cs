@@ -17,7 +17,7 @@ namespace SpaceZelda.Systems
     {
         public override void Process(Entity entity, FarseerWorldComponent farseerWorldComponent)
         {
-            //TODO
+            farseerWorldComponent.world.Step(1f / 60); // 60 FPS
         }
     }
 }

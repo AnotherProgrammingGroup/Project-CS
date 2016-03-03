@@ -2,6 +2,8 @@
 using Artemis.Attributes;
 using Artemis.Manager;
 using Artemis.System;
+using FarseerPhysics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceZelda.Components;
@@ -34,7 +36,9 @@ namespace SpaceZelda.Systems
                                      TextureComponent textureComponent,
                                      TransformComponent transformComponent)
         {
-            //TODO
+            Vector2 position = ConvertUnits.ToDisplayUnits(farseerFixtureComponent.body.Position);
+            position -= transformComponent.Position;
+            spriteBatch.Draw(textureComponent.texture, position, Color.White);
         }
     }
 }

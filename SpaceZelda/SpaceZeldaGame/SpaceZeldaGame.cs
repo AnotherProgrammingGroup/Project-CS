@@ -1,5 +1,6 @@
 ﻿using Artemis;
 using Artemis.System;
+using FarseerPhysics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -27,6 +28,8 @@ namespace SpaceZelda
 
         protected override void Initialize()
         {
+            ConvertUnits.SetDisplayUnitToSimUnitRatio(64f);
+
             spriteBatch = new SpriteBatch(GraphicsDevice);
             entityWorld = new EntityWorld();
 

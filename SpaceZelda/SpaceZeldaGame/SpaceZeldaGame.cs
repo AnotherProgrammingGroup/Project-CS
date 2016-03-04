@@ -29,7 +29,7 @@ namespace SpaceZelda
 
         protected override void Initialize()
         {
-            ConvertUnits.SetDisplayUnitToSimUnitRatio(64f);
+            ConvertUnits.SetDisplayUnitToSimUnitRatio(16f);
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
             entityWorld = new EntityWorld();

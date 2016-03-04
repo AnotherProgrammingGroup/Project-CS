@@ -19,5 +19,11 @@ namespace SpaceZelda.Components
             ContentManager Content = EntitySystem.BlackBoard.GetEntry<ContentManager>("ContentManager");
             texture = Content.Load<Texture2D>(file);
         }
+
+        public TextureComponent(Texture2D texture)
+        {
+            textureFile = "Custom Crop";
+            this.texture = texture;
+        }
     }
 }

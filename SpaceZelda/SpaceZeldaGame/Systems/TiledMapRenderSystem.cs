@@ -49,9 +49,9 @@ namespace SpaceZelda.Systems
                         if (tileset.FirstGid <= tile.Gid && tile.Gid < tileset.FirstGid + tileset.TileCount)
                         {
                             Texture2D texture = textures[tilesetIdx];
-                            //tileWidth and tileHeight are in pixels
+                            // tileWidth and tileHeight are in pixels
                             int tileWidth = tileset.TileWidth, tileHeight = tileset.TileHeight;
-                            //tilesetWidth measure number of tiles across
+                            // tilesetWidth measure number of tiles across
                             int tilesetWidth = texture.Width / (tileWidth + tileset.Spacing);
 
                             int textureID = tile.Gid - tileset.FirstGid;
@@ -64,14 +64,14 @@ namespace SpaceZelda.Systems
 
                             int x = (tileIdx % map.Width) * map.TileWidth;
                             int y = (tileIdx / map.Width) * map.TileHeight + map.TileHeight - 1;
-                            //At this point in time, (x, y) represents bottom left corner of Map tile
+                            // At this point in time, (x, y) represents bottom left corner of Map tile
                             y -= tileHeight - 1;
                             Rectangle destinationRectangle =
                                 new Rectangle((int) (x - transform.X), (int) (y - transform.Y), tileWidth, tileHeight);
 
-                            //Now (x,y) represents top left corner of image tile
-                            //Note that image tile represents the image being drawn,
-                            //which can be a different size than the Map tiles.
+                            // Now (x,y) represents top left corner of image tile
+                            // Note that image tile represents the image being drawn,
+                            // which can be a different size than the Map tiles.
                             spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, Color.White);
 
                             break;

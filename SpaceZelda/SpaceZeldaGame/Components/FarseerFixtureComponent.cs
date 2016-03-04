@@ -1,6 +1,5 @@
 ﻿using Artemis.Interface;
 using FarseerPhysics;
-using FarseerPhysics.Collision.Shapes;
 using FarseerPhysics.Common;
 using FarseerPhysics.Common.Decomposition;
 using FarseerPhysics.Dynamics;
@@ -32,9 +31,10 @@ namespace SpaceZelda.Components
 
         public World world { get; set; }
 
-        public FarseerFixtureComponent(TmxObject tmxObj, World world)
+        public FarseerFixtureComponent(TmxObject tmxObj, World world, Vector2 offset)
         {
             Vector2 position = ConvertUnits.ToSimUnits(new Vector2((float) tmxObj.X, (float) tmxObj.Y));
+            position += ConvertUnits.ToSimUnits(offset);
             body = new Body(world, position);
             foreach (var property in DefaultBodyProperties)
             {
@@ -65,7 +65,8 @@ namespace SpaceZelda.Components
                 case TmxObjectType.Tile:
                     {
                         Vector2 size = ConvertUnits.ToSimUnits(new Vector2((float)tmxObj.Width, (float)tmxObj.Height));
-                        FixtureFactory.AttachRectangle(size.X, size.Y, density, Vector2.Zero, body);
+                        Vector2 offset = new Vector2(size.X / 2, size.Y / 2);
+                        FixtureFactory.AttachRectangle(size.X, size.Y, density, offset, body);
                         break;
                     }
                 case TmxObjectType.Ellipse:

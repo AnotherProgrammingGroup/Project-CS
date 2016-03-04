@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" nextobjectid="36">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" nextobjectid="42">
  <tileset firstgid="1" name="LabTileSet" tilewidth="16" tileheight="16" tilecount="88" columns="11">
   <image source="LabTileSet.png" width="176" height="128"/>
  </tileset>
  <tileset firstgid="89" name="SpaceBackground" tilewidth="480" tileheight="320" tilecount="12" columns="4">
   <image source="SpaceBackground.png" width="1920" height="1080"/>
+ </tileset>
+ <tileset firstgid="101" name="megaman-sprite" tilewidth="30" tileheight="34" tilecount="1" columns="1">
+  <image source="megaman-sprite.png" width="30" height="34"/>
  </tileset>
  <layer name="background" width="30" height="20">
   <data encoding="csv">
@@ -54,7 +57,7 @@
 78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78
 </data>
  </layer>
- <objectgroup name="collision">
+ <objectgroup name="collision" opacity="0.9">
   <object id="1" x="16" y="16">
    <polyline points="0,0 0,288 448,288 448,0 0,0"/>
   </object>
@@ -107,5 +110,8 @@
   <object id="35" x="144.5" y="272" width="12" height="16">
    <ellipse/>
   </object>
+ </objectgroup>
+ <objectgroup name="dynamic">
+  <object id="40" name="player" gid="101" x="324.182" y="112.727" width="30" height="34"/>
  </objectgroup>
 </map>

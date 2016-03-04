@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpaceZelda.Components;
+using SpaceZelda.Utilities;
 
 namespace SpaceZelda
 {
@@ -44,10 +45,7 @@ namespace SpaceZelda
 
         protected override void LoadContent()
         {
-            Entity tiledMapEntity = entityWorld.CreateEntity();
-            tiledMapEntity.Tag = "map";
-            tiledMapEntity.AddComponent(new TransformComponent());
-            tiledMapEntity.AddComponent(new TiledMapComponent("Content/test.tmx", ""));
+            LoadTiledMapUtility.LoadTiledMap(entityWorld, "Content/test.tmx", "");
         }
 
         protected override void UnloadContent()

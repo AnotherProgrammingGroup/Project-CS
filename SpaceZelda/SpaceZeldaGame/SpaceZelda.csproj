@@ -58,6 +58,7 @@
     <Compile Include="Systems\PlayerCollisionSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
     <Compile Include="Systems\TiledMapRenderSystem.cs" />
+    <Compile Include="Utilities\LoadTiledMapUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="artemis, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">

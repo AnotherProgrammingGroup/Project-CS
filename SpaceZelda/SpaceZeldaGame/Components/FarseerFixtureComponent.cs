@@ -105,7 +105,6 @@ namespace SpaceZelda.Components
                 default:
                     {
                         throw new InvalidOperationException("TmxObjectType not recognized: " + tmxObj.ObjectType.ToString());
-                        break;
                     }
             }
         }
@@ -173,7 +172,7 @@ namespace SpaceZelda.Components
             }
             else if (property.Equals("Rotation"))
             {
-                if (value != null)
+                if (value == null)
                 {
 
                 }

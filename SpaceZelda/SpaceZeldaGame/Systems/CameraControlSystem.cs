@@ -23,20 +23,20 @@ namespace SpaceZelda.Systems
 
             if (keyboardState.IsKeyDown(Keys.Left))
             {
-                transformComponent.Position += new Vector2(-1, 0);
+                transformComponent.Position -= new Vector2(-1, 0);
             }
             else if (keyboardState.IsKeyDown(Keys.Right))
             {
-                transformComponent.Position += new Vector2(1, 0);
+                transformComponent.Position -= new Vector2(1, 0);
             }
 
             if (keyboardState.IsKeyDown(Keys.Up))
             {
-                transformComponent.Position += new Vector2(0, -1);
+                transformComponent.Position -= new Vector2(0, -1);
             }
             else if (keyboardState.IsKeyDown(Keys.Down))
             {
-                transformComponent.Position += new Vector2(0, 1);
+                transformComponent.Position -= new Vector2(0, 1);
             }
         }
     }

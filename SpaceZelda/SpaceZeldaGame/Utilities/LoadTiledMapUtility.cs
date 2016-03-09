@@ -37,8 +37,7 @@ namespace SpaceZelda.Utilities
                     foreach (var tmxObj in objLayer.Objects)
                     {
                         Entity fixtureEntity = entityWorld.CreateEntity();
-                        fixtureEntity.AddComponent(new FarseerFixtureComponent(tmxObj, world, Vector2.Zero));
-                        fixtureEntity.AddComponent(new TransformComponent());
+                        fixtureEntity.AddComponent(new FarseerFixtureComponent(tmxObj, world));
                     }
                 }
 
@@ -50,19 +49,17 @@ namespace SpaceZelda.Utilities
                     {
                         tmxObj.Properties.Add("BodyType", "Dynamic");
                         Entity dynamicEntity = entityWorld.CreateEntity();
-                        dynamicEntity.AddComponent(new TransformComponent());
-                        Vector2 offset = Vector2.Zero;
+
                         if (tmxObj.Tile != null)
                         {
+                            dynamicEntity.AddComponent(new TransformComponent());
+
                             Texture2D texture = GetTexture(tmxMap, textures, tmxObj.Tile.Gid);
                             dynamicEntity.AddComponent(new TextureComponent(texture));
-
-                            // For Tile type objects, the (X, Y) position corresponds to bottom left corner
-                            // We need to offset upwards so that it becomes top left corner
-                            // All of our other logic assumes top left corner
-                            offset.Y = -texture.Height;
                         }
-                        dynamicEntity.AddComponent(new FarseerFixtureComponent(tmxObj, world, offset));
+
+                        dynamicEntity.AddComponent(new FarseerFixtureComponent(tmxObj, world));
+
                         if (tmxObj.Name == "player")
                         {
                             dynamicEntity.Tag = "player";

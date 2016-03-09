@@ -67,7 +67,7 @@ namespace SpaceZelda.Systems
                             // At this point in time, (x, y) represents bottom left corner of Map tile
                             y -= tileHeight - 1;
                             Rectangle destinationRectangle =
-                                new Rectangle((int) (x - transform.X), (int) (y - transform.Y), tileWidth, tileHeight);
+                                new Rectangle((int) (x + transform.X), (int) (y + transform.Y), tileWidth, tileHeight);
 
                             // Now (x,y) represents top left corner of image tile
                             // Note that image tile represents the image being drawn,

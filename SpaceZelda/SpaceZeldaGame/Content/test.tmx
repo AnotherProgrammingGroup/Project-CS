@@ -9,7 +9,7 @@
  <tileset firstgid="101" name="megaman-sprite" tilewidth="30" tileheight="34" tilecount="1" columns="1">
   <image source="megaman-sprite.png" width="30" height="34"/>
  </tileset>
- <layer name="background" width="30" height="20">
+ <layer name="background" width="30" height="20" opacity="0.99">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -112,6 +112,6 @@
   </object>
  </objectgroup>
  <objectgroup name="dynamic">
-  <object id="40" name="player" gid="101" x="324.182" y="112.727" width="30" height="34"/>
+  <object id="40" name="player" gid="101" x="116.432" y="220.894" width="30" height="34"/>
  </objectgroup>
 </map>

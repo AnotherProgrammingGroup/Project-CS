@@ -36,8 +36,8 @@ namespace SpaceZelda.Systems
                                      TextureComponent textureComponent,
                                      TransformComponent transformComponent)
         {
-            Vector2 position = ConvertUnits.ToDisplayUnits(farseerFixtureComponent.body.Position);
-            position -= transformComponent.Position;
+            Vector2 position = farseerFixtureComponent.getULPosition();
+            position += transformComponent.Position;
             spriteBatch.Draw(textureComponent.texture, position, Color.White);
         }
     }

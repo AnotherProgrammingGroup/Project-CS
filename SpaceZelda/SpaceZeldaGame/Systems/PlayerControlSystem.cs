@@ -19,7 +19,6 @@ namespace SpaceZelda.Systems
 
         public override void Process(Entity entity)
         {
-            //TODO
         }
     }
 }

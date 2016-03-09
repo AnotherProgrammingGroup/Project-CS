@@ -20,22 +20,62 @@ namespace SpaceZelda.Components
 
     class FarseerFixtureComponent : IComponent
     {
+        //Position is by default center of object
         public Body body { get; set; }
+
+        // offset to transform body position to upper left corner
+        public Vector2 ULoffset { get; set; }
 
         private static string[] DefaultBodyProperties = new string[]
         {
             "BodyType", "Density", "FixedRotation", "Friction", "Mass", "Restitution",  "Rotation"
         };
 
-        public Fixture fixture { get; }
+        public Fixture fixture { get; set; }
+        public List<Fixture> fixtures { get; set; } //for polygons
 
         public World world { get; set; }
 
-        public FarseerFixtureComponent(TmxObject tmxObj, World world, Vector2 offset)
+        // Creates Farseer Fixture based on tmxObj specifications
+        // Can optionally be offset from position given by tmxObj
+        public FarseerFixtureComponent(TmxObject tmxObj, World world, Vector2 offset = default(Vector2))
         {
-            Vector2 position = ConvertUnits.ToSimUnits(new Vector2((float) tmxObj.X, (float) tmxObj.Y));
+            this.world = world;
+            CreateBody(tmxObj, offset);
+            CreateFixture(tmxObj);
+        }
+
+        // Returns converted position (to pixels) of object
+        public Vector2 getULPosition()
+        {
+            return ConvertUnits.ToDisplayUnits(body.Position + ULoffset);
+        }
+
+        private void CreateBody(TmxObject tmxObj, Vector2 offset)
+        {
+            Vector2 position = ConvertUnits.ToSimUnits(new Vector2((float)tmxObj.X, (float)tmxObj.Y));
             position += ConvertUnits.ToSimUnits(offset);
+            switch (tmxObj.ObjectType)
+            {
+                case TmxObjectType.Basic:
+                case TmxObjectType.Tile:
+                case TmxObjectType.Ellipse:
+                    {
+                        //convert position from top right to center
+                        Vector2 size = ConvertUnits.ToSimUnits(new Vector2((float)tmxObj.Width, (float)tmxObj.Height));
+                        position += new Vector2(size.X / 2, size.Y / 2);
+                        ULoffset = new Vector2(-1 * size.X / 2, -1 * size.Y / 2);
+                        break;
+                    }
+                default:
+                    {
+                        ULoffset = Vector2.Zero;
+                        break;
+                    }
+            }
+
             body = new Body(world, position);
+
             foreach (var property in DefaultBodyProperties)
             {
                 string value;
@@ -43,7 +83,10 @@ namespace SpaceZelda.Components
                 // allow null elements to act as a flag to set default values
                 SetProperty(property, value, body);
             }
+        }
 
+        private void CreateFixture(TmxObject tmxObj)
+        {
             float density = 1f;
             string densityStr;
             tmxObj.Properties.TryGetValue("Density", out densityStr);
@@ -51,13 +94,7 @@ namespace SpaceZelda.Components
             {
                 density = float.Parse(densityStr);
             }
-            AttachShape(tmxObj, density);
 
-            this.world = world;
-        }
-
-        private void AttachShape(TmxObject tmxObj, float density)
-        {
             // A Farseer Body's Position variable defines the CENTER of the Body, so we add half the width and height to get it to the desired location.
             switch (tmxObj.ObjectType)
             {
@@ -65,8 +102,7 @@ namespace SpaceZelda.Components
                 case TmxObjectType.Tile:
                     {
                         Vector2 size = ConvertUnits.ToSimUnits(new Vector2((float)tmxObj.Width, (float)tmxObj.Height));
-                        Vector2 offset = new Vector2(size.X / 2, size.Y / 2);
-                        FixtureFactory.AttachRectangle(size.X, size.Y, density, offset, body);
+                        fixture = FixtureFactory.AttachRectangle(size.X, size.Y, density, Vector2.Zero, body);
                         break;
                     }
                 case TmxObjectType.Ellipse:
@@ -74,11 +110,11 @@ namespace SpaceZelda.Components
                         Vector2 size = ConvertUnits.ToSimUnits(new Vector2((float)tmxObj.Width, (float)tmxObj.Height));
                         if (size.X == size.Y)
                         {
-                            FixtureFactory.AttachCircle(size.X / 2, density, body);
+                            fixture = FixtureFactory.AttachCircle(size.X / 2, density, body);
                         }
                         else
                         {
-                            FixtureFactory.AttachEllipse(size.X / 2, size.Y / 2, Settings.MaxPolygonVertices, density, body);
+                            fixture = FixtureFactory.AttachEllipse(size.X / 2, size.Y / 2, Settings.MaxPolygonVertices, density, body);
                         }
                         break;
                     }
@@ -90,7 +126,7 @@ namespace SpaceZelda.Components
                             vertices.Add(ConvertUnits.ToSimUnits(new Vector2((float)v.X, (float)v.Y)));
                         }
                         List<Vertices> decomposedVertices = Triangulate.ConvexPartition(vertices, TriangulationAlgorithm.Bayazit);
-                        FixtureFactory.AttachCompoundPolygon(decomposedVertices, density, body);
+                        fixtures = FixtureFactory.AttachCompoundPolygon(decomposedVertices, density, body);
                         break;
                     }
                 case TmxObjectType.Polyline:
@@ -100,7 +136,7 @@ namespace SpaceZelda.Components
                         {
                             vertices.Add(ConvertUnits.ToSimUnits(new Vector2((float)v.X, (float)v.Y)));
                         }
-                        FixtureFactory.AttachChainShape(vertices, body);
+                        fixture = FixtureFactory.AttachChainShape(vertices, body);
                         break;
                     }
                 default:
@@ -131,11 +167,11 @@ namespace SpaceZelda.Components
             {
                 if (value == null)
                 {
-                    body.FixedRotation = false;
-                }
-                else if (value.Equals("True"))
-                {
                     body.FixedRotation = true;
+                }
+                else if (value.Equals("False"))
+                {
+                    body.FixedRotation = false;;
                 }
             }
             else if (property.Equals("Friction"))

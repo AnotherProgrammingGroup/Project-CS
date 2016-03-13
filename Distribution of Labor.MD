@@ -7,8 +7,9 @@
 4. Complete the current lesson (read the readme for instructions)
 
 ##Frankito
+I'm not dead, I was just sick as shit. I'm back now.
 
 ##CaveStory
 
 ##ecube
-Getting comfortable with C#.
+

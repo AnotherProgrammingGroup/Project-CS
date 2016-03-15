@@ -26,6 +26,6 @@ public class Program
 			}
 			++num;
 		}
-		Console.WriteLine(primes[10001]);
+		Console.WriteLine(primes[10000]);
 	}
 }
